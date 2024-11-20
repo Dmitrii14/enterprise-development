@@ -11,23 +11,23 @@ public class Building
     /// <summary>
     /// Address - a string that store address of building
     /// </summary>
-    public string Address { get; set; } = string.Empty;
+    public string Address { get; set; }
     /// <summary>
     /// DistrictId - id of the district in which the building is located
     /// </summary>
-    public int DistrictId { get; set; } = 0;
+    public int DistrictId { get; set; }
     /// <summary>
     /// Area - Building area
     /// </summary>
-    public double Area { get; set; } = 0.0;
+    public double Area { get; set; }
     /// <summary>
     /// FloorCount - count of floors in building
     /// </summary>
-    public int FloorCount { get; set; } = 1;
+    public int FloorCount { get; set; }
     /// <summary>
     /// BuildDate - date of building construction
     /// </summary>
-    public DateOnly BuildDate { get; set; } = new DateOnly();
+    public DateOnly BuildDate { get; set; }
     /// <summary>
     /// Auctions - list of auctions for which the building was offered
     /// </summary>

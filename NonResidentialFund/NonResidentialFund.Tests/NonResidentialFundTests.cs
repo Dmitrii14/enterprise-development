@@ -9,10 +9,10 @@ public class NonResidentialFundTests
     [Fact]
     public void AllCustomersRequestTest()
     {
-        var fictureBuyers = _fixture.FixtureBuyers;
-        var buyers = (from buyer in fictureBuyers select buyer).ToList();
+        var fixtureBuyers = _fixture.FixtureBuyers;
+        var buyers = (from buyer in fixtureBuyers select buyer).ToList();
 
-        Assert.Equal(8, fictureBuyers.Count);
+        Assert.Equal(8, fixtureBuyers.Count);
         Assert.Contains(buyers, buyer => buyer.BuyerId == 1);
         Assert.Contains(buyers, buyer => buyer.BuyerId == 2);
         Assert.Contains(buyers, buyer => buyer.BuyerId == 3);
@@ -106,12 +106,12 @@ public class NonResidentialFundTests
     {
         var result = (from privatized in _fixture.FixturePrivatized
                       join buyer in _fixture.FixtureBuyers on privatized.BuyerId equals buyer.BuyerId
-                      group privatized by privatized.BuyerId into privGRoup
-                      orderby privGRoup.Sum(privatized => privatized.EndPrice) descending
+                      group privatized by privatized.BuyerId into privGroup
+                      orderby privGroup.Sum(privatized => privatized.EndPrice) descending
                       select new
                       {
-                          privGRoup.First().BuyerId,
-                          expenses = privGRoup.Sum(privatized => privatized.EndPrice)
+                          privGroup.First().BuyerId,
+                          expenses = privGroup.Sum(privatized => privatized.EndPrice)
                       }).Take(5).ToList();
 
         Assert.Equal(4, result.Count);
@@ -120,7 +120,7 @@ public class NonResidentialFundTests
     }
 
     /// <summary>
-    /// Sixth requrst: Output the data on the auctions that brought the most profit
+    /// Sixth request: Output the data on the auctions that brought the most profit
     /// </summary>
     [Fact]
     public void AuctionsWithHighestIncomeRequestTest()

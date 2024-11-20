@@ -7,11 +7,11 @@ public class BuyerAuctionConnection
     /// <summary>
     /// BuyerId - the id of the buyer participating in the auction
     /// </summary>
-    public int BuyerId { get; set; } = 0;
+    public int BuyerId { get; set; }
     /// <summary>
     /// AuctionId - The id of auction
     /// </summary>
-    public int AuctionId { get; set; } = 0;
+    public int AuctionId { get; set; }
 
     public BuyerAuctionConnection(int buyerId, int auctionId)
     {

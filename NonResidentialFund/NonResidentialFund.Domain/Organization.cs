@@ -11,7 +11,7 @@ public class Organization
     /// <summary>
     /// OrganizationName - organization's name
     /// </summary>
-    public string OrganizationName { get; set; } = string.Empty;
+    public string OrganizationName { get; set; }
     public Organization(int organizationId, string organizationName)
     {
         OrganizationId = organizationId;

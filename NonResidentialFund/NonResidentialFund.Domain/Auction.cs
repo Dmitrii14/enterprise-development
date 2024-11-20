@@ -11,19 +11,19 @@ public class Auction
     /// <summary>
     /// Date - auction date
     /// </summary>
-    public DateOnly Date { get; set; } = new DateOnly();
+    public DateOnly Date { get; set; }
     /// <summary>
     /// OrganizationId - the id of the organization that organized the auction
     /// </summary>
-    public int OrganizationId { get; set; } = 0;
+    public int OrganizationId { get; set; }
     /// <summary>
     /// Buildings - List of buildings that were auctioned off
     /// </summary>
-    public List<BuildingAuctionConnection> Buildings { get; set; } = new();
+    public List<BuildingAuctionConnection> Buildings { get; set; }
     /// <summary>
     /// Buyers - List of buyers participating in the auction
     /// </summary>
-    public List<BuyerAuctionConnection> Buyers { get; set; } = new();
+    public List<BuyerAuctionConnection> Buyers { get; set; }
 
     public Auction(int auctionId, DateOnly date, int organizationId, List<BuildingAuctionConnection> buildings, List<BuyerAuctionConnection> buyers)
     {

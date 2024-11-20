@@ -11,23 +11,22 @@ public class Privatized
     /// <summary>
     /// BuyerId - The buyer's id of building
     /// </summary>
-    public int BuyerId { get; set; } = 0;
+    public int BuyerId { get; set; }
     /// <summary>
     /// AuctionId - The id of the auction at which the building was sold
     /// </summary>
-    public int AuctionId { get; set; } = 0;
+    public int AuctionId { get; set; }
     /// <summary>
     /// SaleDate - Date of sale of the building 
     /// </summary>
-    public DateOnly SaleDate { get; set; } = new DateOnly();
+    public DateOnly SaleDate { get; set; }
     /// <summary>
     /// StartPrice - The starting price for this building at the auction
     /// </summary>
-    public double StartPrice { get; set; } = 0.0;
-    /// <summary>
+    public double StartPrice { get; set; }
     /// EndPrice - The final price of this building at the auction
     /// </summary>
-    public double EndPrice { get; set; } = 0.0;
+    public double EndPrice { get; set; }
     public Privatized(int registrationNumber, int buyerId, int auctionId, DateOnly saleDate, double startPrice, double endPrice)
     {
         RegistrationNumber = registrationNumber;

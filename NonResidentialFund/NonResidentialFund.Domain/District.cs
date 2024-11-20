@@ -11,7 +11,7 @@ public class District
     /// <summary>
     /// DistrictName - district's name
     /// </summary>
-    public string DistrictName { get; set; } = string.Empty;
+    public string DistrictName { get; set; }
     public District(int districtId, string districtName)
     {
         DistrictId = districtId;
