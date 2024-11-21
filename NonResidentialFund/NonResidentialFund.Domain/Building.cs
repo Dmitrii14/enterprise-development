@@ -31,7 +31,7 @@ public class Building
     /// <summary>
     /// Auctions - list of auctions for which the building was offered
     /// </summary>
-    public List<BuildingAuctionConnection> Auctions = new();
+    public List<BuildingAuctionConnection> Auctions;
     public Building(int regNum, string address, int districtId, double area, int flourCount, DateOnly buildDate, List<BuildingAuctionConnection> auctions)
     {
         RegistrationNumber = regNum;

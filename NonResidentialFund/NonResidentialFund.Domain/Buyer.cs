@@ -35,7 +35,7 @@ public class Buyer
     /// <summary>
     /// Auctions - List of auctions in which the buyer participated
     /// </summary>
-    public List<BuyerAuctionConnection> Auctions = new();
+    public List<BuyerAuctionConnection> Auctions;
 
     public Buyer(int buyerId, string lastName, string firstName, string middleName,
         string passportSeries, string passportNumber, string address, List<BuyerAuctionConnection> auctions)

@@ -24,6 +24,7 @@ public class Privatized
     /// StartPrice - The starting price for this building at the auction
     /// </summary>
     public double StartPrice { get; set; }
+    /// <summary>
     /// EndPrice - The final price of this building at the auction
     /// </summary>
     public double EndPrice { get; set; }
