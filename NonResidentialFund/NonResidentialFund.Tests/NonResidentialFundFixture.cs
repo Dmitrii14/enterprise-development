@@ -118,37 +118,37 @@ public class NonResidentialFundFixture
 
     public List<Privatized> FixturePrivatized =>
     [       
-        new(1, 1, 1, new DateOnly(2022, 3, 17), 615827.99, 1297618.13),
-        new(2, 4, 2, new DateOnly(2022, 3, 17), 862100.93, 1231971.10),
-        new(3, 8, 3, new DateOnly(2022, 3, 17), 1062109.00, 14301872.17),
-        new(7, 2, 5, new DateOnly(2022, 3, 17), 1846378.72, 2647635.37),
-        new(8, 1, 8, new DateOnly(2022, 3, 20), 628476.17, 964372.09),
-        new(9, 8, 7, new DateOnly(2022, 3, 19), 2657387.93, 4726478.00)
+        new(1, 1, 1, new DateTime(2022, 3, 17), 615827.99, 1297618.13),
+        new(2, 4, 2, new DateTime(2022, 3, 17), 862100.93, 1231971.10),
+        new(3, 8, 3, new DateTime(2022, 3, 17), 1062109.00, 14301872.17),
+        new(7, 2, 5, new DateTime(2022, 3, 17), 1846378.72, 2647635.37),
+        new(8, 1, 8, new DateTime(2022, 3, 20), 628476.17, 964372.09),
+        new(9, 8, 7, new DateTime(2022, 3, 19), 2657387.93, 4726478.00)
     ];
 
     public List<Auction> FixtureAuctions => 
     [
-        new(1, new DateOnly(2022, 3, 17), 1,
+        new(1, new DateTime(2022, 3, 17), 1,
             [ new BuildingAuctionConnection(1, 1), 
                 new BuildingAuctionConnection(9, 1) ],
             [ new BuyerAuctionConnection(1, 1), 
                 new BuyerAuctionConnection(2, 1) ]
         ),
-        new(2, new DateOnly(2022, 3, 17), 3,
+        new(2, new DateTime(2022, 3, 17), 3,
             [ new BuildingAuctionConnection(2, 2) ],
             [ new BuyerAuctionConnection(4, 2), new BuyerAuctionConnection(5, 2) ]
         ),
-        new(3, new DateOnly(2022, 3, 17), 7,
+        new(3, new DateTime(2022, 3, 17), 7,
             [ new BuildingAuctionConnection(3, 3) ],
             [ new BuyerAuctionConnection(8, 3), new BuyerAuctionConnection(7, 3) ]
         ),
-        new(4, new DateOnly(2022, 3, 17), 8,
+        new(4, new DateTime(2022, 3, 17), 8,
             [ new BuildingAuctionConnection(5, 4), 
                 new BuildingAuctionConnection(10, 4) ],
             [ new BuyerAuctionConnection(3, 4), 
                 new BuyerAuctionConnection(6, 4) ]
         ),
-        new(5, new DateOnly(2022, 3, 17), 4,
+        new(5, new DateTime(2022, 3, 17), 4,
             [ new BuildingAuctionConnection(4, 5), new BuildingAuctionConnection(7, 5) ],
             [ new BuyerAuctionConnection(1, 5),
                 new BuyerAuctionConnection(2, 5), 
@@ -159,12 +159,12 @@ public class NonResidentialFundFixture
                 new BuyerAuctionConnection(7, 5), 
                 new BuyerAuctionConnection(8, 5) ]
         ),
-        new(6, new DateOnly(2022, 3, 17), 2,
+        new(6, new DateTime(2022, 3, 17), 2,
             [ new BuildingAuctionConnection(8, 6) ],
             [ new BuyerAuctionConnection(1, 6), 
                 new BuyerAuctionConnection(2, 6) ]
         ),
-        new(7, new DateOnly(2022, 3, 19), 1,
+        new(7, new DateTime(2022, 3, 19), 1,
             [ new BuildingAuctionConnection(9, 7) ],
             [ new BuyerAuctionConnection(1, 7),
                 new BuyerAuctionConnection(2, 7), 
@@ -175,7 +175,7 @@ public class NonResidentialFundFixture
                 new BuyerAuctionConnection(7, 7), 
                 new BuyerAuctionConnection(8, 7) ]
         ),
-        new(8, new DateOnly(2022, 3, 20), 7,
+        new(8, new DateTime(2022, 3, 20), 7,
             [ new BuildingAuctionConnection(8, 8) ],
             [ new BuyerAuctionConnection(1, 8), 
                 new BuyerAuctionConnection(2, 8), 
@@ -186,11 +186,11 @@ public class NonResidentialFundFixture
                 new BuyerAuctionConnection(7, 8), 
                 new BuyerAuctionConnection(8, 8) ]
         ),
-        new(9, new DateOnly(2022, 3, 21), 2,
+        new(9, new DateTime(2022, 3, 21), 2,
             [ new BuildingAuctionConnection(10, 9) ],
             [ new BuyerAuctionConnection(7, 9), new BuyerAuctionConnection(3, 9) ]
         ),
-        new(10, new DateOnly(2022, 3, 21), 3,
+        new(10, new DateTime(2022, 3, 21), 3,
             [ new BuildingAuctionConnection(5, 10) ],
             [ new BuyerAuctionConnection(8, 10), 
                 new BuyerAuctionConnection(4, 10), 
