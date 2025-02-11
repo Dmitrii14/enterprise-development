@@ -2,6 +2,7 @@
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace NonResidentialFund.Domain;
+
 /// <summary>
 /// BuildingAuctionConnection - class that describes the relationship between the auction and the buildings offered at that auction
 /// </summary>
@@ -12,6 +13,7 @@ public class BuildingAuctionConnection
     /// </summary>
     [Key]
     public int Id { get; set; }
+
     /// <summary>
     /// BuildingId - The id of the building being auctioned off
     /// </summary>
@@ -19,23 +21,29 @@ public class BuildingAuctionConnection
     public int BuildingId { get; set; }
 
     /// <summary>
-    /// Building - The navigation property is a link to the Building object
+    /// Building - the building object.
     /// </summary>
-    public Building Building { get; set; }
+    public Building? Building { get; set; } // Помечено как nullable
 
     /// <summary>
-    /// AuctionId - The id of auction
+    /// AuctionID - is the auction ID.
     /// </summary>
     [ForeignKey(nameof(Auction))]
     public int AuctionId { get; set; }
 
     /// <summary>
-    /// Auction - The navigation property is a link to the Auction object
+    /// Auction - the auction object.
     /// </summary>
-    public Auction Auction { get; set; }
+    public Auction? Auction { get; set; } // Помечено как nullable
 
+    /// <summary>
+    /// Empty constructor for serialization or other purposes
+    /// </summary>
     public BuildingAuctionConnection() { }
 
+    /// <summary>
+    /// Constructor with parameters for creating an object
+    /// </summary>
     public BuildingAuctionConnection(int buildingId, int auctionId)
     {
         BuildingId = buildingId;

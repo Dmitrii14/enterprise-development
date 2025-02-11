@@ -7,7 +7,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NonResidentialFund.Domain",
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NonResidentialFund.Tests", "NonResidentialFund.Tests\NonResidentialFund.Tests.csproj", "{4ED0DE36-D459-4A43-B28D-FF27F83801D5}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NonResidentialFund.Server", "NonResidentialFund.Server\NonResidentialFund.Server.csproj", "{2A5B09D6-5B62-4512-A429-BFDAE8FADCB2}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NonResidentialFund.Server", "NonResidentialFund.Server\NonResidentialFund.Server.csproj", "{2A5B09D6-5B62-4512-A429-BFDAE8FADCB2}"
 	ProjectSection(ProjectDependencies) = postProject
 		{4ED0DE36-D459-4A43-B28D-FF27F83801D5} = {4ED0DE36-D459-4A43-B28D-FF27F83801D5}
 		{F959B288-111A-4327-99D0-0BB233EF820E} = {F959B288-111A-4327-99D0-0BB233EF820E}

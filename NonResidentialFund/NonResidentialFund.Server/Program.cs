@@ -6,7 +6,21 @@ using NonResidentialFund.Server.Repository;
 using System.Reflection;
 
 var builder = WebApplication.CreateBuilder(args);
-
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowReactApp", policy =>
+    {
+        var clientAddresses = builder.Configuration.GetSection("ClientAddresses").Get<Dictionary<string, string>>();
+        if (clientAddresses == null || !clientAddresses.Any())
+        {
+            throw new Exception("Секция 'ClientAddresses' не найдена или пуста в конфигурации appsettings.json.");
+        }
+        policy.WithOrigins(clientAddresses.Values.ToArray())
+              .AllowAnyHeader()
+              .AllowAnyMethod()
+              .AllowCredentials();
+    });
+});
 var mapperConfig = new MapperConfiguration(config => config.AddProfile(new MappingProfile()));
 var mapper = mapperConfig.CreateMapper();
 
