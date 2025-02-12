@@ -1,5 +1,8 @@
 ﻿namespace NonResidentialFund.Server.Dto;
 
+/// <summary>
+/// Data Transfer Object (DTO) for creating or updating building data.
+/// </summary>
 public class BuildingPostDto
 {
     /// <summary>
@@ -13,15 +16,15 @@ public class BuildingPostDto
     /// <summary>
     /// DistrictId - id of the district in which the building is located
     /// </summary>
-    public int DistrictId { get; set; } = 0;
+    public int DistrictId { get; set; }
     /// <summary>
     /// Area - Building area
     /// </summary>
-    public double Area { get; set; } = 0.0;
+    public double Area { get; set; }
     /// <summary>
     /// FloorCount - count of floors in building
     /// </summary>
-    public int FloorCount { get; set; } = 1;
+    public int FloorCount { get; set; }
     /// <summary>
     /// BuildDate - date of building construction
     /// </summary>

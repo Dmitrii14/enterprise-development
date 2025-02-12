@@ -1,5 +1,8 @@
 ﻿namespace NonResidentialFund.Server.Dto;
 
+/// <summary>
+/// Data Transfer Object (DTO) for representing auction income data.
+/// </summary>
 public class AuctionIncomeDto
 {
     /// <summary>

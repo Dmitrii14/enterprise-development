@@ -36,8 +36,14 @@ public class Auction
     [InverseProperty(nameof(Auction))]
     public List<BuyerAuctionConnection> Buyers { get; set; } = null!;
 
+    /// <summary>
+    /// Default constructor for the Auction class
+    /// </summary>
     public Auction() { }
 
+    /// <summary>
+    /// Constructor for the Auction class, allowing initialization of all properties when creating an object
+    /// </summary>
     public Auction(int auctionId, DateTime date, int organizationId, List<BuildingAuctionConnection> buildings, List<BuyerAuctionConnection> buyers)
     {
         AuctionId = auctionId;

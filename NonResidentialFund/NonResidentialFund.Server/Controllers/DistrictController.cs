@@ -5,6 +5,10 @@ using NonResidentialFund.Server.Dto;
 using NonResidentialFund.Server.Repository;
 
 namespace NonResidentialFund.Server.Controllers;
+
+/// <summary>
+/// Controller for handling district-related operations.
+/// </summary>
 [Route("api/[controller]")]
 [ApiController]
 public class DistrictController : ControllerBase
@@ -15,6 +19,9 @@ public class DistrictController : ControllerBase
 
     private readonly IMapper _mapper;
 
+    /// <summary>
+    /// Initializes a new instance of the DistrictController class using dependency injection to set up logger, repository, and mapper instances.
+    /// </summary>
     public DistrictController(ILogger<DistrictController> logger, INonResidentialFundRepository districtsRepository, IMapper mapper)
     {
         _logger = logger;
@@ -41,7 +48,7 @@ public class DistrictController : ControllerBase
     [HttpGet("{id}")]
     public ActionResult<DistrictGetDto> Get(int id)
     {
-        var district = _districtsRepository.Districts.FirstOrDefault(district => district.DistrictId == id);
+        var district = _districtsRepository.Districts.FirstOrDefault(dist => dist.DistrictId == id);
         if (district == null)
         {
             _logger.LogInformation("Not found district with id: {id}", id);
@@ -73,7 +80,7 @@ public class DistrictController : ControllerBase
     [HttpPut("{id}")]
     public IActionResult Put(int id, [FromBody] DistrictPostDto districtToPut)
     {
-        var district = _districtsRepository.Districts.FirstOrDefault(district => district.DistrictId == id);
+        var district = _districtsRepository.Districts.FirstOrDefault(dist => dist.DistrictId == id);
         if (district == null)
         {
             _logger.LogInformation("Not found district {id}", id);
@@ -94,7 +101,7 @@ public class DistrictController : ControllerBase
     [HttpDelete("{id}")]
     public IActionResult Delete(int id)
     {
-        var district = _districtsRepository.Districts.FirstOrDefault(district => district.DistrictId == id);
+        var district = _districtsRepository.Districts.FirstOrDefault(dist=> dist.DistrictId == id);
         if (district == null)
         {
             _logger.LogInformation("Not found district with id: {id}", id);

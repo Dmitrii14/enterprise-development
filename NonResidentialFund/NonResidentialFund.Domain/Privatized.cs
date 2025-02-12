@@ -22,7 +22,7 @@ public class Privatized
     /// <summary>
     /// Buyer - The navigation property is a link to the Buyer object
     /// </summary>
-    public Buyer Buyer { get; set; }
+    public Buyer? Buyer { get; set; }
     /// <summary>
     /// AuctionId - The id of the auction at which the building was sold
     /// </summary>
@@ -32,7 +32,7 @@ public class Privatized
     /// <summary>
     /// Auction - The navigation property is a link to the Auction object
     /// </summary>
-    public Auction Auction { get; set; }
+    public Auction? Auction { get; set; }
 
     /// <summary>
     /// SaleDate - Date of sale of the building 
@@ -49,8 +49,14 @@ public class Privatized
     /// </summary>
     public double EndPrice { get; set; }
 
+    /// <summary>
+    /// Default constructor for the Privatized class.
+    /// </summary>
     public Privatized() { }
 
+    /// <summary>
+    /// Constructor for the Privatized class, allowing initialization of privatization details.
+    /// </summary>
     public Privatized(int registrationNumber, int buyerId, int auctionId, DateTime saleDate, double startPrice, double endPrice)
     {
         RegistrationNumber = registrationNumber;

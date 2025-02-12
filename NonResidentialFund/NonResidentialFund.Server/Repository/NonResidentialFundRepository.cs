@@ -2,6 +2,9 @@
 
 namespace NonResidentialFund.Server.Repository;
 
+/// <summary>
+/// Repository class for managing non-residential fund data.
+/// </summary>
 public class NonResidentialFundRepository : INonResidentialFundRepository
 {
     private readonly List<District> _districts;
@@ -11,6 +14,9 @@ public class NonResidentialFundRepository : INonResidentialFundRepository
     private readonly List<Privatized> _privatized;
     private readonly List<Auction> _auctions;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="NonResidentialFundRepository"/> class.
+    /// </summary>
     public NonResidentialFundRepository()
     {
         _districts = new List<District> {
@@ -295,10 +301,32 @@ public class NonResidentialFundRepository : INonResidentialFundRepository
         };
     }
 
+    /// <summary>
+    /// Gets a list of districts associated with the non-residential fund.
+    /// </summary>
     public List<District> Districts => _districts;
+
+    /// <summary>
+    /// Gets a list of organizations involved with the non-residential fund.
+    /// </summary>
     public List<Organization> Organizations => _organizations;
+
+    /// <summary>
+    /// Gets a list of buyers participating in auctions within the fund.
+    /// </summary>
     public List<Buyer> Buyers => _buyers;
+
+    /// <summary>
+    /// Gets a list of buildings associated with the non-residential fund.
+    /// </summary>
     public List<Building> Buildings => _buildings;
+    /// <summary>
+    /// Gets a list of privatized entities within the fund.
+    /// </summary>
     public List<Privatized> Privatized => _privatized;
+
+    /// <summary>
+    /// Gets a list of all auctions related to the non-residential fund.
+    /// </summary>
     public List<Auction> Auctions => _auctions;
 }

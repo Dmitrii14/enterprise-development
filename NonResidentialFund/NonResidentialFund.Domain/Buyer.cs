@@ -11,7 +11,7 @@ public class Buyer
     /// BuyerId - the id of the buyer
     /// </summary>
     [Key]
-    public int BuyerId { get; set; } = 0;
+    public int BuyerId { get; set; }
 
     /// <summary>
     /// LastName - buyer's last name
@@ -49,8 +49,14 @@ public class Buyer
     [InverseProperty(nameof(Buyer))]
     public List<BuyerAuctionConnection> Auctions { get; set; } = null!;
 
+    /// <summary>
+    /// Default constructor for the Buyer class
+    /// </summary>
     public Buyer() { }
 
+    /// <summary>
+    /// Constructor for the Buyer class, which allows initializing all properties when creating an object
+    /// </summary>
     public Buyer(int buyerId, string lastName, string firstName, string middleName,
         string passportSeries, string passportNumber, string address, List<BuyerAuctionConnection> auctions)
     {

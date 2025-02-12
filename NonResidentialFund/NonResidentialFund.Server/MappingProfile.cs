@@ -4,8 +4,14 @@ using NonResidentialFund.Server.Dto;
 
 namespace NonResidentialFund.Server;
 
+/// <summary>
+/// Mapping profile for configuring AutoMapper mappings.
+/// </summary>
 public class MappingProfile : Profile
 {
+    /// <summary>
+    /// Initializes a new instance of the <see cref="MappingProfile"/> class.
+    /// </summary>
     public MappingProfile()
     {
         CreateMap<Auction, AuctionGetDto>();

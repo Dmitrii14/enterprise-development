@@ -1,5 +1,8 @@
 ﻿namespace NonResidentialFund.Server.Dto;
 
+/// <summary>
+/// Data Transfer Object (DTO) for retrieving organization data.
+/// </summary>
 public class OrganizationGetDto
 {
     /// <summary>

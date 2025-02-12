@@ -17,8 +17,14 @@ public class Organization
     /// </summary>
     public string OrganizationName { get; set; } = string.Empty;
 
+    /// <summary>
+    /// Default constructor for the Organization class.
+    /// </summary>
     public Organization() { }
 
+    /// <summary>
+    /// Constructor for the Organization class, allowing initialization of organization ID and name.
+    /// </summary>
     public Organization(int organizationId, string organizationName)
     {
         OrganizationId = organizationId;

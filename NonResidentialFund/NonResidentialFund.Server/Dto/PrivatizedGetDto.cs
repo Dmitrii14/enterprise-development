@@ -1,5 +1,8 @@
 ﻿namespace NonResidentialFund.Server.Dto;
 
+/// <summary>
+/// Data Transfer Object (DTO) for retrieving privatization data.
+/// </summary>
 public class PrivatizedGetDto
 {
     /// <summary>
@@ -9,11 +12,11 @@ public class PrivatizedGetDto
     /// <summary>
     /// BuyerId - The buyer's id of building
     /// </summary>
-    public int BuyerId { get; set; } = 0;
+    public int BuyerId { get; set; }
     /// <summary>
     /// AuctionId - The id of the auction at which the building was sold
     /// </summary>
-    public int AuctionId { get; set; } = 0;
+    public int AuctionId { get; set; }
     /// <summary>
     /// SaleDate - Date of sale of the building 
     /// </summary>
@@ -21,9 +24,9 @@ public class PrivatizedGetDto
     /// <summary>
     /// StartPrice - The starting price for this building at the auction
     /// </summary>
-    public double StartPrice { get; set; } = 0.0;
+    public double StartPrice { get; set; }
     /// <summary>
     /// EndPrice - The final price of this building at the auction
     /// </summary>
-    public double EndPrice { get; set; } = 0.0;
+    public double EndPrice { get; set; }
 }

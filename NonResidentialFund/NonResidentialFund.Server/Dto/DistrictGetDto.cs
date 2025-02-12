@@ -1,5 +1,8 @@
 ﻿namespace NonResidentialFund.Server.Dto;
 
+/// <summary>
+/// Data Transfer Object (DTO) for retrieving district data.
+/// </summary>
 public class DistrictGetDto
 {
     /// <summary>

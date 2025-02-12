@@ -6,6 +6,9 @@ using NonResidentialFund.Server.Repository;
 
 namespace NonResidentialFund.Server.Controllers;
 
+/// <summary>
+/// Controller for handling privatized-related operations.
+/// </summary>
 [Route("api/[controller]")]
 [ApiController]
 public class PrivatizedController : ControllerBase
@@ -16,6 +19,9 @@ public class PrivatizedController : ControllerBase
 
     private readonly IMapper _mapper;
 
+    /// <summary>
+    /// Initializes a new instance of the PrivatizedController class using dependency injection to set up logger, repository, and mapper instances.
+    /// </summary>
     public PrivatizedController(ILogger<PrivatizedController> logger, INonResidentialFundRepository privatizedRepository, IMapper mapper)
     {
         _logger = logger;
@@ -42,7 +48,7 @@ public class PrivatizedController : ControllerBase
     [HttpGet("{registrationNumber}")]
     public ActionResult<PrivatizedGetDto> Get(int registrationNumber)
     {
-        var privatized = _privatizedRepository.Privatized.FirstOrDefault(privatized => privatized.RegistrationNumber == registrationNumber);
+        var privatized = _privatizedRepository.Privatized.FirstOrDefault(priv => priv.RegistrationNumber == registrationNumber);
         if (privatized == null)
         {
             _logger.LogInformation("Not found privatized building with registration number: {registrationNumber}", registrationNumber);
@@ -74,7 +80,7 @@ public class PrivatizedController : ControllerBase
     [HttpPut("{registrationNumber}")]
     public IActionResult Put(int registrationNumber, [FromBody] PrivatizedPostDto privatizedToPut)
     {
-        var privatized = _privatizedRepository.Privatized.FirstOrDefault(privatized => privatized.RegistrationNumber == registrationNumber);
+        var privatized = _privatizedRepository.Privatized.FirstOrDefault(priv => priv.RegistrationNumber == registrationNumber);
         if (privatized == null)
         {
             _logger.LogInformation("Not found privatized building with registration number: {registrationNumber}", registrationNumber);
@@ -99,7 +105,7 @@ public class PrivatizedController : ControllerBase
     [HttpDelete("{registrationNumber}")]
     public IActionResult Delete(int registrationNumber)
     {
-        var privatized = _privatizedRepository.Privatized.FirstOrDefault(privatized => privatized.RegistrationNumber == registrationNumber);
+        var privatized = _privatizedRepository.Privatized.FirstOrDefault(priv => priv.RegistrationNumber == registrationNumber);
         if (privatized == null)
         {
             _logger.LogInformation("Not found privatized building with registration number: {registrationNumber}", registrationNumber);

@@ -1,5 +1,8 @@
 ﻿namespace NonResidentialFund.Server.Dto;
 
+/// <summary>
+/// Data Transfer Object (DTO) for creating or updating auction data.
+/// </summary>
 public class AuctionPostDto
 {
     /// <summary>
@@ -9,5 +12,5 @@ public class AuctionPostDto
     /// <summary>
     /// OrganizationId - the id of the organization that organized the auction
     /// </summary>
-    public int OrganizationId { get; set; } = 0;
+    public int OrganizationId { get; set; }
 }

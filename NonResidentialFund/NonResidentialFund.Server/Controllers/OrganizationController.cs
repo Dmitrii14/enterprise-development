@@ -5,6 +5,10 @@ using NonResidentialFund.Server.Dto;
 using NonResidentialFund.Server.Repository;
 
 namespace NonResidentialFund.Server.Controllers;
+
+/// <summary>
+/// Controller for handling organization-related operations.
+/// </summary>
 [Route("api/[controller]")]
 [ApiController]
 public class OrganizationController : ControllerBase
@@ -15,6 +19,9 @@ public class OrganizationController : ControllerBase
 
     private readonly IMapper _mapper;
 
+    /// <summary>
+    /// Initializes a new instance of the OrganizationController class using dependency injection to set up logger, repository, and mapper instances.
+    /// </summary>
     public OrganizationController(ILogger<OrganizationController> logger, INonResidentialFundRepository organizationsRepository, IMapper mapper)
     {
         _logger = logger;
@@ -41,7 +48,7 @@ public class OrganizationController : ControllerBase
     [HttpGet("{id}")]
     public ActionResult<OrganizationGetDto> Get(int id)
     {
-        var organization = _organizationsRepository.Organizations.FirstOrDefault(organization => organization.OrganizationId == id);
+        var organization = _organizationsRepository.Organizations.FirstOrDefault(organiz => organiz.OrganizationId == id);
         if (organization == null)
         {
             _logger.LogInformation("Not found organization with id: {id}", id);
@@ -73,7 +80,7 @@ public class OrganizationController : ControllerBase
     [HttpPut("{id}")]
     public IActionResult Put(int id, [FromBody] OrganizationPostDto organizationToPut)
     {
-        var organization = _organizationsRepository.Organizations.FirstOrDefault(organization => organization.OrganizationId == id);
+        var organization = _organizationsRepository.Organizations.FirstOrDefault(organiz => organiz.OrganizationId == id);
         if (organization == null)
         {
             _logger.LogInformation("Not found organization with id: {id}", id);
@@ -94,7 +101,7 @@ public class OrganizationController : ControllerBase
     [HttpDelete("{id}")]
     public IActionResult Delete(int id)
     {
-        var organization = _organizationsRepository.Organizations.FirstOrDefault(organization => organization.OrganizationId == id);
+        var organization = _organizationsRepository.Organizations.FirstOrDefault(organiz => organiz.OrganizationId == id);
         if (organization == null)
         {
             _logger.LogInformation("Not found organization with id: {id}", id);

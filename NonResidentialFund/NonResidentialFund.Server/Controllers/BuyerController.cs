@@ -5,6 +5,10 @@ using NonResidentialFund.Server.Dto;
 using NonResidentialFund.Server.Repository;
 
 namespace NonResidentialFund.Server.Controllers;
+
+/// <summary>
+/// Controller for handling buyer-related operations.
+/// </summary>
 [Route("api/[controller]")]
 [ApiController]
 public class BuyerController : ControllerBase
@@ -15,6 +19,9 @@ public class BuyerController : ControllerBase
 
     private readonly IMapper _mapper;
 
+    /// <summary>
+    /// Initializes a new instance of the BuyerController class using dependency injection to set up logger, repository, and mapper instances.
+    /// </summary>
     public BuyerController(ILogger<BuyerController> logger, INonResidentialFundRepository buyersRepository, IMapper mapper)
     {
         _logger = logger;
@@ -41,7 +48,7 @@ public class BuyerController : ControllerBase
     [HttpGet("{id}")]
     public ActionResult<BuyerGetDto> Get(int id)
     {
-        var buyer = _buyersRepository.Buyers.FirstOrDefault(buyer => buyer.BuyerId == id);
+        var buyer = _buyersRepository.Buyers.FirstOrDefault(b => b.BuyerId == id);
         if (buyer == null)
         {
             _logger.LogInformation("Not found buyer with id: {id}", id);
@@ -73,7 +80,7 @@ public class BuyerController : ControllerBase
     [HttpPut("{id}")]
     public IActionResult Put(int id, [FromBody] BuyerPostDto buyerToPut)
     {
-        var buyer = _buyersRepository.Buyers.FirstOrDefault(buyer => buyer.BuyerId == id);
+        var buyer = _buyersRepository.Buyers.FirstOrDefault(b => b.BuyerId == id);
         if (buyer == null)
         {
             _logger.LogInformation("Not found buyer with id: {id}", id);
@@ -94,7 +101,7 @@ public class BuyerController : ControllerBase
     [HttpDelete("{id}")]
     public IActionResult Delete(int id)
     {
-        var buyer = _buyersRepository.Buyers.FirstOrDefault(buyer => buyer.BuyerId == id);
+        var buyer = _buyersRepository.Buyers.FirstOrDefault(b => b.BuyerId == id);
         if (buyer == null)
         {
             _logger.LogInformation("Not found buyer with id: {id}", id);
@@ -115,7 +122,7 @@ public class BuyerController : ControllerBase
     [HttpGet("{id}/Auctions")]
     public ActionResult<IEnumerable<BuyerAuctionConnectionForBuyerDto>> GetAuctions(int id)
     {
-        var buyer = _buyersRepository.Buyers.FirstOrDefault(buyer => buyer.BuyerId == id);
+        var buyer = _buyersRepository.Buyers.FirstOrDefault(b => b.BuyerId == id);
         if (buyer == null)
         {
             _logger.LogInformation("Not found buyer with id: {id}", id);
@@ -137,8 +144,8 @@ public class BuyerController : ControllerBase
     [HttpPost("{id}/Auctions")]
     public IActionResult PostAuction(int id, [FromBody] BuyerAuctionConnectionForBuyerDto connection)
     {
-        var buyer = _buyersRepository.Buyers.FirstOrDefault(buyer => buyer.BuyerId == id);
-        var auction = _buyersRepository.Auctions.FirstOrDefault(auction => auction.AuctionId == connection.AuctionId);
+        var buyer = _buyersRepository.Buyers.FirstOrDefault(b => b.BuyerId == id);
+        var auction = _buyersRepository.Auctions.FirstOrDefault(a => a.AuctionId == connection.AuctionId);
         if (buyer == null)
         {
             _logger.LogInformation("Not found buyer with id: {id}", id);
@@ -146,7 +153,7 @@ public class BuyerController : ControllerBase
         }
         else
         {
-            if (auction != null && buyer.Auctions.FirstOrDefault(auction => auction.AuctionId == connection.AuctionId) == null)
+            if (auction != null && buyer.Auctions.FirstOrDefault(auct => auct.AuctionId == connection.AuctionId) == null)
             {
                 var connectionToAdd = new BuyerAuctionConnection(id, connection.AuctionId);
                 buyer.Auctions.Add(connectionToAdd);
@@ -169,8 +176,8 @@ public class BuyerController : ControllerBase
     [HttpDelete("{id}/Auctions")]
     public IActionResult DeleteAuction(int id, [FromBody] BuyerAuctionConnectionForBuyerDto connection)
     {
-        var buyer = _buyersRepository.Buyers.FirstOrDefault(buyer => buyer.BuyerId == id);
-        var auction = _buyersRepository.Auctions.FirstOrDefault(auction => auction.AuctionId == connection.AuctionId);
+        var buyer = _buyersRepository.Buyers.FirstOrDefault(b => b.BuyerId == id);
+        var auction = _buyersRepository.Auctions.FirstOrDefault(a => a.AuctionId == connection.AuctionId);
         if (buyer == null)
         {
             _logger.LogInformation("Not found buyer with id: {id}", id);
@@ -178,7 +185,7 @@ public class BuyerController : ControllerBase
         }
         else
         {
-            var connectionToDelete = buyer.Auctions.FirstOrDefault(auction => auction.AuctionId == connection.AuctionId);
+            var connectionToDelete = buyer.Auctions.FirstOrDefault(auct => auct.AuctionId == connection.AuctionId);
             if (connectionToDelete != null)
             {
                 buyer.Auctions.Remove(connectionToDelete);

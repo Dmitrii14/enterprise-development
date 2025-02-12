@@ -25,20 +25,19 @@ var mapperConfig = new MapperConfiguration(config => config.AddProfile(new Mappi
 var mapper = mapperConfig.CreateMapper();
 
 builder.Services.AddSingleton(mapper);
-
 builder.Services.AddSingleton<INonResidentialFundRepository, NonResidentialFundRepository>();
 
+builder.Services.AddDbContextFactory<NonResidentialFundContext>(options =>
+options.UseMySQL(builder.Configuration.GetConnectionString("NonResidentialFund")!));
+
 builder.Services.AddControllers();
-builder.Services.AddDbContextFactory<NonResidentialFundContext>(optionsBuilder =>
-{
-    var connectionString = builder.Configuration.GetConnectionString("NonResidentialFund");
-    optionsBuilder.UseMySQL(connectionString);
-});
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen(options =>
+
+var xmlFile = $"{System.Reflection.Assembly.GetExecutingAssembly().GetName().Name}.xml";
+var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
+builder.Services.AddSwaggerGen(c =>
 {
-    var xmlFileName = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
-    options.IncludeXmlComments(Path.Combine(AppContext.BaseDirectory, xmlFileName));
+    c.IncludeXmlComments(xmlPath);
 });
 
 var app = builder.Build();
@@ -49,7 +48,12 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
+app.UseCors("app");
+
 app.UseHttpsRedirection();
+
+app.UseAuthorization();
+
 app.MapControllers();
 
 app.Run();

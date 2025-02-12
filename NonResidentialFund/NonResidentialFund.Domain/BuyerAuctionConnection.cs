@@ -22,7 +22,7 @@ public class BuyerAuctionConnection
     /// <summary>
     /// Buyer - The navigation property is a link to the Buyer object
     /// </summary>
-    public Buyer Buyer { get; set; }
+    public Buyer? Buyer { get; set; }
 
     /// <summary>
     /// AuctionId - The id of auction
@@ -33,10 +33,16 @@ public class BuyerAuctionConnection
     /// <summary>
     /// Auction - The navigation property is a link to the Auction object
     /// </summary>
-    public Auction Auction { get; set; }
+    public Auction? Auction { get; set; }
 
+    /// <summary>
+    /// Default constructor for the BuyerAuctionConnection class.
+    /// </summary>
     public BuyerAuctionConnection() { }
 
+    /// <summary>
+    /// Constructor for the BuyerAuctionConnection class, allowing initialization of buyer and auction IDs.
+    /// </summary>
     public BuyerAuctionConnection(int buyerId, int auctionId)
     {
         BuyerId = buyerId;

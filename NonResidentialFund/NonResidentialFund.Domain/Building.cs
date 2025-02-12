@@ -27,7 +27,7 @@ public class Building
     /// <summary>
     /// District - the navigation property is a link to the District object 
     /// </summary>
-    public District District { get; set; }
+    public District? District { get; set; }
 
     /// <summary>
     /// Area - Building area
@@ -50,8 +50,14 @@ public class Building
     [InverseProperty(nameof(Building))]
     public List<BuildingAuctionConnection> Auctions { get; set; } = null!;
 
+    /// <summary>
+    /// Default constructor for the Building class.
+    /// </summary>
     public Building() { }
 
+    /// <summary>
+    /// Constructor for the Building class, allowing initialization of all properties when creating an object.
+    /// </summary>
     public Building(int regNum, string address, int districtId, double area, int flourCount, DateTime buildDate, List<BuildingAuctionConnection> auctions)
     {
         RegistrationNumber = regNum;

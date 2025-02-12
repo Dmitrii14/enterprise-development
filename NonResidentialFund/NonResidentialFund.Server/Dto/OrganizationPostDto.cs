@@ -1,5 +1,8 @@
 ﻿namespace NonResidentialFund.Server.Dto;
 
+/// <summary>
+/// Data Transfer Object (DTO) for creating or updating organization data.
+/// </summary>
 public class OrganizationPostDto
 {
     /// <summary>

@@ -5,6 +5,10 @@ using NonResidentialFund.Server.Dto;
 using NonResidentialFund.Server.Repository;
 
 namespace NonResidentialFund.Server.Controllers;
+
+/// <summary>
+/// Controller for handling building-related operations.
+/// </summary>
 [Route("api/[controller]")]
 [ApiController]
 public class BuildingController : ControllerBase
@@ -15,6 +19,9 @@ public class BuildingController : ControllerBase
 
     private readonly IMapper _mapper;
 
+    /// <summary>
+    /// Initializes a new instance of the BuildingController class using dependency injection to set up logger, repository, and mapper instances.
+    /// </summary>
     public BuildingController(ILogger<BuildingController> logger, INonResidentialFundRepository buildingsRepository, IMapper mapper)
     {
         _logger = logger;
@@ -41,7 +48,7 @@ public class BuildingController : ControllerBase
     [HttpGet("{registrationNumber}")]
     public ActionResult<BuildingGetDto> Get(int registrationNumber)
     {
-        var building = _buildingsRepository.Buildings.FirstOrDefault(building => building.RegistrationNumber == registrationNumber);
+        var building = _buildingsRepository.Buildings.FirstOrDefault(b => b.RegistrationNumber == registrationNumber);
         if (building == null)
         {
             _logger.LogInformation("Not found building with registration number: {registrationNumber}", registrationNumber);
@@ -73,7 +80,7 @@ public class BuildingController : ControllerBase
     [HttpPut("{registrationNumber}")]
     public IActionResult Put(int registrationNumber, [FromBody] BuildingPostDto buildingToPut)
     {
-        var building = _buildingsRepository.Buildings.FirstOrDefault(building => building.RegistrationNumber == registrationNumber);
+        var building = _buildingsRepository.Buildings.FirstOrDefault(b => b.RegistrationNumber == registrationNumber);
         if (building == null)
         {
             _logger.LogInformation("Not found building with registration number: {registrationNumber}", registrationNumber);
@@ -94,7 +101,7 @@ public class BuildingController : ControllerBase
     [HttpDelete("{registrationNumber}")]
     public IActionResult Delete(int registrationNumber)
     {
-        var building = _buildingsRepository.Buildings.FirstOrDefault(building => building.RegistrationNumber == registrationNumber);
+        var building = _buildingsRepository.Buildings.FirstOrDefault(b => b.RegistrationNumber == registrationNumber);
         if (building == null)
         {
             _logger.LogInformation("Not found building with registration number: {registrationNumber}", registrationNumber);
@@ -115,7 +122,7 @@ public class BuildingController : ControllerBase
     [HttpGet("{registrationNumber}/Auctions")]
     public ActionResult<IEnumerable<BuildingAuctionConnectionForBuildingDto>> GetAuctions(int registrationNumber)
     {
-        var building = _buildingsRepository.Buildings.FirstOrDefault(building => building.RegistrationNumber == registrationNumber);
+        var building = _buildingsRepository.Buildings.FirstOrDefault(b => b.RegistrationNumber == registrationNumber);
         if (building == null)
         {
             _logger.LogInformation("Not found building with registrationNumber: {registrationNumber}", registrationNumber);
@@ -137,8 +144,8 @@ public class BuildingController : ControllerBase
     [HttpPost("{registrationNumber}/Auctions")]
     public IActionResult PostAuction(int registrationNumber, [FromBody] BuildingAuctionConnectionForBuildingDto connection)
     {
-        var building = _buildingsRepository.Buildings.FirstOrDefault(building => building.RegistrationNumber == registrationNumber);
-        var auction = _buildingsRepository.Auctions.FirstOrDefault(auction => auction.AuctionId == connection.AuctionId);
+        var building = _buildingsRepository.Buildings.FirstOrDefault(b => b.RegistrationNumber == registrationNumber);
+        var auction = _buildingsRepository.Auctions.FirstOrDefault(a => a.AuctionId == connection.AuctionId);
         if (building == null)
         {
             _logger.LogInformation("Not found building with registration number: {registrationNumber}", registrationNumber);
@@ -146,7 +153,7 @@ public class BuildingController : ControllerBase
         }
         else
         {
-            if (auction != null && building.Auctions.FirstOrDefault(auction => auction.AuctionId == connection.AuctionId) == null)
+            if (auction != null && building.Auctions.FirstOrDefault(auct => auct.AuctionId == connection.AuctionId) == null)
             {
                 var connectionToAdd = new BuildingAuctionConnection(registrationNumber, connection.AuctionId);
                 building.Auctions.Add(connectionToAdd);
@@ -169,8 +176,8 @@ public class BuildingController : ControllerBase
     [HttpDelete("{registrationNumber}/Auctions")]
     public IActionResult DeleteAuction(int registrationNumber, [FromBody] BuildingAuctionConnectionForBuildingDto connection)
     {
-        var building = _buildingsRepository.Buildings.FirstOrDefault(building => building.RegistrationNumber == registrationNumber);
-        var auction = _buildingsRepository.Auctions.FirstOrDefault(auction => auction.AuctionId == connection.AuctionId);
+        var building = _buildingsRepository.Buildings.FirstOrDefault(b => b.RegistrationNumber == registrationNumber);
+        var auction = _buildingsRepository.Auctions.FirstOrDefault(a => a.AuctionId == connection.AuctionId);
         if (building == null)
         {
             _logger.LogInformation("Not found buildiing with registration number: {registrationNumber}", registrationNumber);
@@ -178,7 +185,7 @@ public class BuildingController : ControllerBase
         }
         else
         {
-            var connectionToDelete = building.Auctions.FirstOrDefault(auction => auction.AuctionId == connection.AuctionId);
+            var connectionToDelete = building.Auctions.FirstOrDefault(auct => auct.AuctionId == connection.AuctionId);
             if (connectionToDelete != null)
             {
                 building.Auctions.Remove(connectionToDelete);

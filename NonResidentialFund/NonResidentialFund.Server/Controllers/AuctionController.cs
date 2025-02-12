@@ -6,6 +6,9 @@ using NonResidentialFund.Server.Repository;
 
 namespace NonResidentialFund.Server.Controllers;
 
+/// <summary>
+/// Controller for handling auction-related operations.
+/// </summary>
 [Route("api/[controller]")]
 [ApiController]
 public class AuctionController : ControllerBase
@@ -16,6 +19,9 @@ public class AuctionController : ControllerBase
 
     private readonly IMapper _mapper;
 
+    /// <summary>
+    /// Initializes a new instance of the AuctionController class using dependency injection to set up logger, repository, and mapper instances.
+    /// </summary>
     public AuctionController(ILogger<AuctionController> logger, INonResidentialFundRepository auctionsRepository, IMapper mapper)
     {
         _logger = logger;
@@ -42,7 +48,7 @@ public class AuctionController : ControllerBase
     [HttpGet("{id:int}")]
     public ActionResult<AuctionGetDto> Get(int id)
     {
-        var auction = _auctionsRepository.Auctions.FirstOrDefault(auction => auction.AuctionId == id);
+        var auction = _auctionsRepository.Auctions.FirstOrDefault(a => a.AuctionId == id);
         if (auction == null)
         {
             _logger.LogInformation("Not found auction with id: {id}", id);
@@ -74,7 +80,7 @@ public class AuctionController : ControllerBase
     [HttpPut("{id}")]
     public IActionResult Put(int id, [FromBody] AuctionPostDto auctionToPut)
     {
-        var auction = _auctionsRepository.Auctions.FirstOrDefault(auction => auction.AuctionId == id);
+        var auction = _auctionsRepository.Auctions.FirstOrDefault(a => a.AuctionId == id);
         if (auction == null)
         {
             _logger.LogInformation("Not found auction with id: {id}", id);
@@ -95,7 +101,7 @@ public class AuctionController : ControllerBase
     [HttpDelete("{id}")]
     public IActionResult Delete(int id)
     {
-        var auction = _auctionsRepository.Auctions.FirstOrDefault(auction => auction.AuctionId == id);
+        var auction = _auctionsRepository.Auctions.FirstOrDefault(a => a.AuctionId == id);
         if (auction == null)
         {
             _logger.LogInformation("Not found auction with id: {id}", id);
@@ -116,7 +122,7 @@ public class AuctionController : ControllerBase
     [HttpGet("{id}/Buildings")]
     public ActionResult<IEnumerable<BuildingAuctionConnectionForAuctionDto>> GetBuildings(int id)
     {
-        var auction = _auctionsRepository.Auctions.FirstOrDefault(auction => auction.AuctionId == id);
+        var auction = _auctionsRepository.Auctions.FirstOrDefault(a => a.AuctionId == id);
         if (auction == null)
         {
             _logger.LogInformation("Not found auction with id: {id}", id);
@@ -138,8 +144,8 @@ public class AuctionController : ControllerBase
     [HttpPost("{id}/Buildings")]
     public IActionResult PostBuilding(int id, [FromBody] BuildingAuctionConnectionForAuctionDto connection)
     {
-        var auction = _auctionsRepository.Auctions.FirstOrDefault(auction => auction.AuctionId == id);
-        var building = _auctionsRepository.Buildings.FirstOrDefault(building => building.RegistrationNumber == connection.BuildingId);
+        var auction = _auctionsRepository.Auctions.FirstOrDefault(a => a.AuctionId == id);
+        var building = _auctionsRepository.Buildings.FirstOrDefault(b => b.RegistrationNumber == connection.BuildingId);
         if (auction == null)
         {
             _logger.LogInformation("Not found auction with id: {id}", id);
@@ -170,8 +176,8 @@ public class AuctionController : ControllerBase
     [HttpDelete("{id}/Buildings")]
     public IActionResult DeleteBuilding(int id, [FromBody] BuildingAuctionConnectionForAuctionDto connection)
     {
-        var auction = _auctionsRepository.Auctions.FirstOrDefault(auction => auction.AuctionId == id);
-        var building = _auctionsRepository.Buildings.FirstOrDefault(building => building.RegistrationNumber == connection.BuildingId);
+        var auction = _auctionsRepository.Auctions.FirstOrDefault(a => a.AuctionId == id);
+        var building = _auctionsRepository.Buildings.FirstOrDefault(b => b.RegistrationNumber == connection.BuildingId);
         if (auction == null)
         {
             _logger.LogInformation("Not found auction with id: {id}", id);
@@ -179,7 +185,7 @@ public class AuctionController : ControllerBase
         }
         else
         {
-            var connectionToDelete = auction.Buildings.FirstOrDefault(building => building.BuildingId == connection.BuildingId);
+            var connectionToDelete = auction.Buildings.FirstOrDefault(bldg => bldg.BuildingId == connection.BuildingId);
             if (connectionToDelete != null)
             {
                 auction.Buildings.Remove(connectionToDelete);
@@ -201,7 +207,7 @@ public class AuctionController : ControllerBase
     [HttpGet("{id}/Buyers")]
     public ActionResult<IEnumerable<BuyerAuctionConnectionForAuctionDto>> GetBuyers(int id)
     {
-        var auction = _auctionsRepository.Auctions.FirstOrDefault(auction => auction.AuctionId == id);
+        var auction = _auctionsRepository.Auctions.FirstOrDefault(a => a.AuctionId == id);
         if (auction == null)
         {
             _logger.LogInformation("Not found auction with id: {id}", id);
@@ -223,8 +229,8 @@ public class AuctionController : ControllerBase
     [HttpPost("{id}/Buyers")]
     public IActionResult PostBuilding(int id, [FromBody] BuyerAuctionConnectionForAuctionDto connection)
     {
-        var auction = _auctionsRepository.Auctions.FirstOrDefault(auction => auction.AuctionId == id);
-        var buyer = _auctionsRepository.Buyers.FirstOrDefault(buyer => buyer.BuyerId == connection.BuyerId);
+        var auction = _auctionsRepository.Auctions.FirstOrDefault(a => a.AuctionId == id);
+        var buyer = _auctionsRepository.Buyers.FirstOrDefault(b => b.BuyerId == connection.BuyerId);
         if (auction == null)
         {
             _logger.LogInformation("Not found auction with id: {id}", id);
@@ -232,7 +238,7 @@ public class AuctionController : ControllerBase
         }
         else
         {
-            if (buyer != null && auction.Buyers.FirstOrDefault(buyer => buyer.BuyerId == connection.BuyerId) == null)
+            if (buyer != null && auction.Buyers.FirstOrDefault(br => br.BuyerId == connection.BuyerId) == null)
             {
                 var connectionToAdd = new BuyerAuctionConnection(connection.BuyerId, id);
                 auction.Buyers.Add(connectionToAdd);
@@ -255,8 +261,8 @@ public class AuctionController : ControllerBase
     [HttpDelete("{id}/Buyers")]
     public IActionResult DeleteBuyer(int id, [FromBody] BuyerAuctionConnectionForAuctionDto connection)
     {
-        var auction = _auctionsRepository.Auctions.FirstOrDefault(auction => auction.AuctionId == id);
-        var buyer = _auctionsRepository.Buyers.FirstOrDefault(buyer => buyer.BuyerId == connection.BuyerId);
+        var auction = _auctionsRepository.Auctions.FirstOrDefault(a => a.AuctionId == id);
+        var buyer = _auctionsRepository.Buyers.FirstOrDefault(b => b.BuyerId == connection.BuyerId);
         if (auction == null)
         {
             _logger.LogInformation("Not found auction with id: {id}", id);
@@ -264,7 +270,7 @@ public class AuctionController : ControllerBase
         }
         else
         {
-            var connectionToDelete = auction.Buyers.FirstOrDefault(buyer => buyer.BuyerId == connection.BuyerId);
+            var connectionToDelete = auction.Buyers.FirstOrDefault(br => br.BuyerId == connection.BuyerId);
             if (connectionToDelete != null)
             {
                 auction.Buyers.Remove(connectionToDelete);

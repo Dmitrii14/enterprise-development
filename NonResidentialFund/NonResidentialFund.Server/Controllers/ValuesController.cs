@@ -5,6 +5,9 @@ using NonResidentialFund.Server.Repository;
 
 namespace NonResidentialFund.Server.Controllers;
 
+/// <summary>
+/// Controller for handling requests-related operations.
+/// </summary>
 [Route("api/[controller]")]
 [ApiController]
 public class RequestsController : ControllerBase
@@ -13,6 +16,9 @@ public class RequestsController : ControllerBase
     private readonly INonResidentialFundRepository _requestsRepository;
     private readonly IMapper _mapper;
 
+    /// <summary>
+    /// Initializes a new instance of the RequestsController class using dependency injection to set up logger, repository, and mapper instances.
+    /// </summary>
     public RequestsController(ILogger<RequestsController> logger, INonResidentialFundRepository requestsRepository, IMapper mapper)
     {
         _logger = logger;
@@ -106,12 +112,12 @@ public class RequestsController : ControllerBase
     {
         var result = (from privatized in _requestsRepository.Privatized
                       join buyer in _requestsRepository.Buyers on privatized.BuyerId equals buyer.BuyerId
-                      group privatized by privatized.BuyerId into privGRoup
-                      orderby privGRoup.Sum(privatized => privatized.EndPrice) descending
+                      group privatized by privatized.BuyerId into privGroup
+                      orderby privGroup.Sum(privatized => privatized.EndPrice) descending
                       select new BuyerExpensesDto()
                       {
-                          BuyerId = privGRoup.First().BuyerId,
-                          Expenses = privGRoup.Sum(privatized => privatized.EndPrice)
+                          BuyerId = privGroup.First().BuyerId,
+                          Expenses = privGroup.Sum(privatized => privatized.EndPrice)
                       }).Take(5).ToList();
         return result;
     }
