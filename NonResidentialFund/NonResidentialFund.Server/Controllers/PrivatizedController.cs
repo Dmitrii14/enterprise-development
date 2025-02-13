@@ -1,8 +1,8 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using NonResidentialFund.Domain;
 using NonResidentialFund.Server.Dto;
-using NonResidentialFund.Server.Repository;
 
 namespace NonResidentialFund.Server.Controllers;
 
@@ -13,19 +13,17 @@ namespace NonResidentialFund.Server.Controllers;
 [ApiController]
 public class PrivatizedController : ControllerBase
 {
+    private readonly IDbContextFactory<NonResidentialFundContext> _contextFactory;
     private readonly ILogger<PrivatizedController> _logger;
-
-    private readonly INonResidentialFundRepository _privatizedRepository;
-
     private readonly IMapper _mapper;
 
     /// <summary>
     /// Initializes a new instance of the PrivatizedController class using dependency injection to set up logger, repository, and mapper instances.
     /// </summary>
-    public PrivatizedController(ILogger<PrivatizedController> logger, INonResidentialFundRepository privatizedRepository, IMapper mapper)
+    public PrivatizedController(IDbContextFactory<NonResidentialFundContext> contextFactory, ILogger<PrivatizedController> logger, IMapper mapper)
     {
+        _contextFactory = contextFactory;
         _logger = logger;
-        _privatizedRepository = privatizedRepository;
         _mapper = mapper;
     }
 
@@ -34,10 +32,12 @@ public class PrivatizedController : ControllerBase
     /// </summary>
     /// <returns>List of prtivatized buildings</returns>
     [HttpGet]
-    public IEnumerable<PrivatizedGetDto> Get()
+    public async Task<IEnumerable<PrivatizedGetDto>> Get()
     {
         _logger.LogInformation("Get all privatized buildings");
-        return _mapper.Map<IEnumerable<PrivatizedGetDto>>(_privatizedRepository.Privatized);
+        using var ctx = await _contextFactory.CreateDbContextAsync();
+        var privatized = await ctx.Privatized.ToListAsync();
+        return _mapper.Map<IEnumerable<PrivatizedGetDto>>(privatized);
     }
 
     /// <summary>
@@ -46,9 +46,10 @@ public class PrivatizedController : ControllerBase
     /// <param name="registrationNumber">registration number of the privatized building</param>
     /// <returns>Result of operation and privatized building object</returns>
     [HttpGet("{registrationNumber}")]
-    public ActionResult<PrivatizedGetDto> Get(int registrationNumber)
+    public async Task<ActionResult<PrivatizedGetDto>> Get(int registrationNumber)
     {
-        var privatized = _privatizedRepository.Privatized.FirstOrDefault(priv => priv.RegistrationNumber == registrationNumber);
+        using var ctx = await _contextFactory.CreateDbContextAsync();
+        var privatized = await ctx.Privatized.FirstOrDefaultAsync(privatized => privatized.RegistrationNumber == registrationNumber);
         if (privatized == null)
         {
             _logger.LogInformation("Not found privatized building with registration number: {registrationNumber}", registrationNumber);
@@ -66,9 +67,13 @@ public class PrivatizedController : ControllerBase
     /// </summary>
     /// <param name="privatized">Privatized building to be created</param>
     [HttpPost]
-    public void Post([FromBody] PrivatizedPostDto privatized)
+    public async Task<ActionResult<PrivatizedGetDto>> Post([FromBody] PrivatizedPostDto privatized)
     {
-        _privatizedRepository.Privatized.Add(_mapper.Map<Privatized>(privatized));
+        using var ctx = await _contextFactory.CreateDbContextAsync();
+        var privatizedToAdd = _mapper.Map<Privatized>(privatized);
+        ctx.Privatized.Add(privatizedToAdd);
+        await ctx.SaveChangesAsync();
+        return Ok(_mapper.Map<PrivatizedGetDto>(privatizedToAdd));
     }
 
     /// <summary>
@@ -78,9 +83,10 @@ public class PrivatizedController : ControllerBase
     /// <param name="privatizedToPut">New privatized building data</param>
     /// <returns>Result of operation</returns>
     [HttpPut("{registrationNumber}")]
-    public IActionResult Put(int registrationNumber, [FromBody] PrivatizedPostDto privatizedToPut)
+    public async Task<ActionResult<PrivatizedGetDto>> Put(int registrationNumber, [FromBody] PrivatizedPostDto privatizedToPut)
     {
-        var privatized = _privatizedRepository.Privatized.FirstOrDefault(priv => priv.RegistrationNumber == registrationNumber);
+        using var ctx = await _contextFactory.CreateDbContextAsync();
+        var privatized = await ctx.Privatized.FirstOrDefaultAsync(privatized => privatized.RegistrationNumber == registrationNumber);
         if (privatized == null)
         {
             _logger.LogInformation("Not found privatized building with registration number: {registrationNumber}", registrationNumber);
@@ -92,8 +98,9 @@ public class PrivatizedController : ControllerBase
             {
                 return BadRequest();
             }
-            _mapper.Map(privatizedToPut, privatized);
-            return Ok();
+            ctx.Privatized.Update(_mapper.Map(privatizedToPut, privatized));
+            await ctx.SaveChangesAsync();
+            return Ok(_mapper.Map<PrivatizedGetDto>(privatized));
         }
     }
 
@@ -103,9 +110,10 @@ public class PrivatizedController : ControllerBase
     /// <param name="registrationNumber">Registration number of the privatized building to be removed</param>
     /// <returns>Result of operation</returns>
     [HttpDelete("{registrationNumber}")]
-    public IActionResult Delete(int registrationNumber)
+    public async Task<IActionResult> Delete(int registrationNumber)
     {
-        var privatized = _privatizedRepository.Privatized.FirstOrDefault(priv => priv.RegistrationNumber == registrationNumber);
+        using var ctx = await _contextFactory.CreateDbContextAsync();
+        var privatized = await ctx.Privatized.FirstOrDefaultAsync(privatized => privatized.RegistrationNumber == registrationNumber);
         if (privatized == null)
         {
             _logger.LogInformation("Not found privatized building with registration number: {registrationNumber}", registrationNumber);
@@ -113,7 +121,8 @@ public class PrivatizedController : ControllerBase
         }
         else
         {
-            _privatizedRepository.Privatized.Remove(privatized);
+            ctx.Privatized.Remove(privatized);
+            await ctx.SaveChangesAsync();
             return Ok();
         }
     }
