@@ -19,12 +19,12 @@ const BuyerUpdate = () => {
     const fetchBuyer = async () => {
       try {
         const response = await api.get(`/Buyer/${id}`);
-        setLastName(response.data.LastName);
-        setFirstName(response.data.FirstName);
-        setMiddleName(response.data.MiddleName);
-        setPassportSeries(response.data.PassportSeries);
-        setPassportNumber(response.data.PassportNumber);
-        setAddress(response.data.Address);
+        setLastName(response.data.lastName);
+        setFirstName(response.data.firstName);
+        setMiddleName(response.data.middleName);
+        setPassportSeries(response.data.passportSeries);
+        setPassportNumber(response.data.passportNumber);
+        setAddress(response.data.address);
       } catch (error) {
         console.error('Error fetching buyer:', error);
         setError('Buyer not found');
