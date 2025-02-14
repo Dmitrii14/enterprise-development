@@ -16,12 +16,12 @@ const BuyerCreate = () => {
     e.preventDefault();
     try {
       await api.post('/Buyer', {
-        lastName,
-        firstName,
-        middleName,
-        passportSeries,
-        passportNumber,
-        address
+        LastName: lastName.trim(),
+        FirstName: firstName.trim(),
+        MiddleName: middleName.trim(),
+        PassportSeries: passportSeries,
+        PassportNumber: passportNumber,
+        Address: address
       });
       setMessage('Buyer created successfully!');
       setTimeout(() => {
