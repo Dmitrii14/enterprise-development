@@ -65,10 +65,10 @@ const BuyerList = () => {
               </button>
               {expandedBuyerId === buyer.buyerId && (
                 <div className="mt-2">
-                  <p><strong>Middle Name:</strong> {buyer.MiddleName}</p>
-                  <p><strong>Passport Series:</strong> {buyer.PassportSeries}</p>
-                  <p><strong>Passport Number:</strong> {buyer.PassportNumber}</p>
-                  <p><strong>Address:</strong> {buyer.Address}</p>
+                  <p><strong>Middle Name:</strong> {buyer.middleName}</p>
+                  <p><strong>Passport Series:</strong> {buyer.passportSeries}</p>
+                  <p><strong>Passport Number:</strong> {buyer.passportNumber}</p>
+                  <p><strong>Address:</strong> {buyer.address}</p>
                   <div className="mt-2">
                     <Link to={`/buyer/update/${buyer.buyerId}`} className="btn btn-warning btn-sm me-2">Update</Link>
                     <button onClick={() => deleteBuyer(buyer.buyerId)} className="btn btn-danger btn-sm">Delete</button>
