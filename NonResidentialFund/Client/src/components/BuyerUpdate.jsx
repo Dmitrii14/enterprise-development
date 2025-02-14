@@ -40,9 +40,9 @@ const BuyerUpdate = () => {
     e.preventDefault();
     try {
       await api.put(`/Buyer/${id}`, { 
-        LastName: lastName,
-        FirstName: firstName,
-        MiddleName: middleName,
+        LastName: lastName.trim(),
+        FirstName: firstName.trim(),
+        MiddleName: middleName.trim(),
         PassportSeries: passportSeries,
         PassportNumber: passportNumber,
         Address: address
