@@ -35,7 +35,7 @@ public class AuctionController : ControllerBase
     public async Task<IEnumerable<AuctionGetDto>> Get()
     {
         _logger.LogInformation("Get all auctions");
-        var auctions = await _context.Auctions.FindAsync();
+        var auctions = await _context.Auctions.ToListAsync();
         return _mapper.Map<IEnumerable<AuctionGetDto>>(auctions); ;
     }
 
@@ -47,7 +47,7 @@ public class AuctionController : ControllerBase
     [HttpGet("{id:int}")]
     public async Task<ActionResult<AuctionGetDto>> Get(int id)
     {
-        var auction = await _context.Auctions.FindAsync(id);
+        var auction = await _context.Auctions.FirstOrDefaultAsync(auction => auction.AuctionId == id);
         if (auction == null)
         {
             _logger.LogInformation("Not found auction with id: {id}", id);
