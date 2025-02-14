@@ -13,16 +13,16 @@ namespace NonResidentialFund.Server.Controllers;
 [ApiController]
 public class BuyerController : ControllerBase
 {
-    private readonly IDbContextFactory<NonResidentialFundContext> _contextFactory;
+    private readonly NonResidentialFundContext _context;
     private readonly ILogger<BuyerController> _logger;
     private readonly IMapper _mapper;
 
     /// <summary>
     /// Initializes a new instance of the BuyerController class using dependency injection to set up logger, repository, and mapper instances.
     /// </summary>
-    public BuyerController(IDbContextFactory<NonResidentialFundContext> contextFactory, ILogger<BuyerController> logger, IMapper mapper)
+    public BuyerController(NonResidentialFundContext context, ILogger<BuyerController> logger, IMapper mapper)
     {
-        _contextFactory = contextFactory;
+        _context = context;
         _logger = logger;
         _mapper = mapper;
     }
@@ -35,8 +35,7 @@ public class BuyerController : ControllerBase
     public async Task<IEnumerable<BuyerGetDto>> Get()
     {
         _logger.LogInformation("Get all buyers");
-        using var ctx = await _contextFactory.CreateDbContextAsync();
-        var buyers = await ctx.Buyers.ToListAsync();
+        var buyers = await _context.Buyers.ToListAsync();
         return _mapper.Map<IEnumerable<BuyerGetDto>>(buyers);
     }
 
@@ -48,8 +47,7 @@ public class BuyerController : ControllerBase
     [HttpGet("{id}")]
     public async Task<ActionResult<BuyerGetDto>> Get(int id)
     {
-        using var ctx = await _contextFactory.CreateDbContextAsync();
-        var buyer = await ctx.Buyers.FirstOrDefaultAsync(buyer => buyer.BuyerId == id);
+        var buyer = await _context.Buyers.FirstOrDefaultAsync(buyer => buyer.BuyerId == id);
         if (buyer == null)
         {
             _logger.LogInformation("Not found buyer with id: {id}", id);
@@ -70,10 +68,9 @@ public class BuyerController : ControllerBase
     public async Task<ActionResult<BuyerGetDto>> Post([FromBody] BuyerPostDto buyer)
     {
         _logger.LogInformation("Created new buyer");
-        using var ctx = await _contextFactory.CreateDbContextAsync();
         var buyerToAdd = _mapper.Map<Buyer>(buyer);
-        ctx.Buyers.Add(buyerToAdd);
-        await ctx.SaveChangesAsync();
+        await _context.Buyers.AddAsync(buyerToAdd);
+        await _context.SaveChangesAsync();
         return Ok(_mapper.Map<BuyerGetDto>(buyerToAdd));
     }
 
@@ -86,8 +83,7 @@ public class BuyerController : ControllerBase
     [HttpPut("{id}")]
     public async Task<ActionResult<BuyerGetDto>> Put(int id, [FromBody] BuyerPostDto buyerToPut)
     {
-        using var ctx = await _contextFactory.CreateDbContextAsync();
-        var buyer = await ctx.Buyers.FirstOrDefaultAsync(buyer => buyer.BuyerId == id);
+        var buyer = await _context.Buyers.FirstOrDefaultAsync(buyer => buyer.BuyerId == id);
         if (buyer == null)
         {
             _logger.LogInformation("Not found buyer with id: {id}", id);
@@ -95,8 +91,8 @@ public class BuyerController : ControllerBase
         }
         else
         {
-            ctx.Buyers.Update(_mapper.Map(buyerToPut, buyer));
-            await ctx.SaveChangesAsync();
+            _mapper.Map(buyerToPut, buyer);
+            await _context.SaveChangesAsync();
             return Ok(_mapper.Map<BuyerGetDto>(buyer));
         }
     }
@@ -109,8 +105,7 @@ public class BuyerController : ControllerBase
     [HttpDelete("{id}")]
     public async Task<IActionResult> Delete(int id)
     {
-        using var ctx = await _contextFactory.CreateDbContextAsync();
-        var buyer = await ctx.Buyers.FirstOrDefaultAsync(buyer => buyer.BuyerId == id);
+        var buyer = await _context.Buyers.FirstOrDefaultAsync(buyer => buyer.BuyerId == id);
         if (buyer == null)
         {
             _logger.LogInformation("Not found buyer with id: {id}", id);
@@ -118,8 +113,8 @@ public class BuyerController : ControllerBase
         }
         else
         {
-            ctx.Buyers.Remove(buyer);
-            await ctx.SaveChangesAsync();
+            _context.Buyers.Remove(buyer);
+            await _context.SaveChangesAsync();
             return Ok();
         }
     }
@@ -132,8 +127,9 @@ public class BuyerController : ControllerBase
     [HttpGet("{id}/Auctions")]
     public async Task<ActionResult<IEnumerable<BuyerAuctionConnectionForBuyerDto>>> GetAuctions(int id)
     {
-        using var ctx = await _contextFactory.CreateDbContextAsync();
-        var buyer = await ctx.Buyers.Include(buyer => buyer.Auctions).FirstOrDefaultAsync(buyer => buyer.BuyerId == id);
+        var buyer = await _context.Buyers
+        .Include(buyer => buyer.Auctions)
+        .FirstOrDefaultAsync(buyer => buyer.BuyerId == id);
         if (buyer == null)
         {
             _logger.LogInformation("Not found buyer with id: {id}", id);
@@ -155,28 +151,24 @@ public class BuyerController : ControllerBase
     [HttpPost("{id}/Auctions")]
     public async Task<ActionResult<BuyerAuctionConnectionForBuyerDto>> PostAuction(int id, [FromBody] BuyerAuctionConnectionForBuyerDto connection)
     {
-        using var ctx = await _contextFactory.CreateDbContextAsync();
-        var buyer = await ctx.Buyers.Include(buyer => buyer.Auctions).FirstOrDefaultAsync(buyer => buyer.BuyerId == id);
-        var auction = await ctx.Auctions.FirstOrDefaultAsync(auction => auction.AuctionId == connection.AuctionId);
+        var buyer = await _context.Buyers
+        .Include(buyer => buyer.Auctions)
+        .FirstOrDefaultAsync(buyer => buyer.BuyerId == id);
         if (buyer == null)
         {
             _logger.LogInformation("Not found buyer with id: {id}", id);
             return NotFound();
         }
-        else
+        var auction = await _context.Auctions.FirstOrDefaultAsync(a => a.AuctionId == connection.AuctionId);
+        if (auction != null && buyer.Auctions.FirstOrDefault(conn => conn.AuctionId == connection.AuctionId) == null)
         {
-            if (auction != null && buyer.Auctions.FirstOrDefault(conn => conn.AuctionId == connection.AuctionId) == null)
-            {
-                var connectionToAdd = new BuyerAuctionConnection(id, connection.AuctionId);
-                buyer.Auctions.Add(connectionToAdd);
-                await ctx.SaveChangesAsync();
-                return Ok(_mapper.Map<BuyerAuctionConnectionForBuyerDto>(connectionToAdd));
-            }
-            else
-            {
-                return BadRequest();
-            }
+            var connectionToAdd = new BuyerAuctionConnection(id, connection.AuctionId);
+            buyer.Auctions.Add(connectionToAdd);
+            await _context.SaveChangesAsync();
+            return Ok(_mapper.Map<BuyerAuctionConnectionForBuyerDto>(connectionToAdd));
         }
+        else
+            return BadRequest();
     }
 
     /// <summary>
@@ -188,27 +180,23 @@ public class BuyerController : ControllerBase
     [HttpDelete("{id}/Auctions")]
     public async Task<IActionResult> DeleteAuction(int id, [FromBody] BuyerAuctionConnectionForBuyerDto connection)
     {
-        using var ctx = await _contextFactory.CreateDbContextAsync();
-        var buyer = await ctx.Buyers.Include(buyer => buyer.Auctions).FirstOrDefaultAsync(buyer => buyer.BuyerId == id);
-        var auction = await ctx.Auctions.FirstOrDefaultAsync(auction => auction.AuctionId == connection.AuctionId);
+        var buyer = await _context.Buyers
+        .Include(buyer => buyer.Auctions)
+        .FirstOrDefaultAsync(buyer => buyer.BuyerId == id);
         if (buyer == null)
         {
             _logger.LogInformation("Not found buyer with id: {id}", id);
             return NotFound();
         }
-        else
+        var auction = await _context.Auctions.FirstOrDefaultAsync(a => a.AuctionId == connection.AuctionId);
+        var connectionToDelete = buyer.Auctions.FirstOrDefault(conn => conn.AuctionId == connection.AuctionId);
+        if (connectionToDelete != null)
         {
-            var connectionToDelete = buyer.Auctions.FirstOrDefault(conn => conn.AuctionId == connection.AuctionId);
-            if (connectionToDelete != null)
-            {
-                buyer.Auctions.Remove(connectionToDelete);
-                await ctx.SaveChangesAsync();
-                return Ok();
-            }
-            else
-            {
-                return BadRequest();
-            }
+            buyer.Auctions.Remove(connectionToDelete);
+            await _context.SaveChangesAsync();
+            return Ok();
         }
+        else
+            return BadRequest();
     }
 }

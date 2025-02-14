@@ -13,16 +13,16 @@ namespace NonResidentialFund.Server.Controllers;
 [ApiController]
 public class OrganizationController : ControllerBase
 {
-    private readonly IDbContextFactory<NonResidentialFundContext> _contextFactory;
+    private readonly NonResidentialFundContext _context;
     private readonly ILogger<OrganizationController> _logger;
     private readonly IMapper _mapper;
 
     /// <summary>
     /// Initializes a new instance of the OrganizationController class using dependency injection to set up logger, repository, and mapper instances.
     /// </summary>
-    public OrganizationController(IDbContextFactory<NonResidentialFundContext> contextFactory, ILogger<OrganizationController> logger, IMapper mapper)
+    public OrganizationController(NonResidentialFundContext context, ILogger<OrganizationController> logger, IMapper mapper)
     {
-        _contextFactory = contextFactory;
+        _context = context;
         _logger = logger;
         _mapper = mapper;
     }
@@ -34,9 +34,8 @@ public class OrganizationController : ControllerBase
     [HttpGet]
     public async Task<IEnumerable<OrganizationGetDto>> Get()
     {
-        _logger.LogInformation("Get all organization");
-        using var ctx = await _contextFactory.CreateDbContextAsync();
-        var organizations = await ctx.Organizations.ToListAsync();
+        _logger.LogInformation("Get all organizations");
+        var organizations = await _context.Organizations.ToListAsync();
         return _mapper.Map<IEnumerable<OrganizationGetDto>>(organizations);
     }
 
@@ -48,8 +47,7 @@ public class OrganizationController : ControllerBase
     [HttpGet("{id}")]
     public async Task<ActionResult<OrganizationGetDto>> Get(int id)
     {
-        using var ctx = await _contextFactory.CreateDbContextAsync();
-        var organization = await ctx.Organizations.FirstOrDefaultAsync(organization => organization.OrganizationId == id);
+        var organization = await _context.Organizations.FirstOrDefaultAsync(organization => organization.OrganizationId == id);
         if (organization == null)
         {
             _logger.LogInformation("Not found organization with id: {id}", id);
@@ -69,10 +67,10 @@ public class OrganizationController : ControllerBase
     [HttpPost]
     public async Task<ActionResult<OrganizationGetDto>> Post([FromBody] OrganizationPostDto organization)
     {
-        using var ctx = await _contextFactory.CreateDbContextAsync();
+        _logger.LogInformation("Created new organization");
         var organizationToPut = _mapper.Map<Organization>(organization);
-        ctx.Organizations.Add(organizationToPut);
-        await ctx.SaveChangesAsync();
+        await _context.Organizations.AddAsync(organizationToPut);
+        await _context.SaveChangesAsync();
         return Ok(_mapper.Map<OrganizationGetDto>(organizationToPut));
     }
 
@@ -85,8 +83,7 @@ public class OrganizationController : ControllerBase
     [HttpPut("{id}")]
     public async Task<ActionResult<OrganizationGetDto>> Put(int id, [FromBody] OrganizationPostDto organizationToPut)
     {
-        using var ctx = await _contextFactory.CreateDbContextAsync();
-        var organization = await ctx.Organizations.FirstOrDefaultAsync(organization => organization.OrganizationId == id);
+        var organization = await _context.Organizations.FirstOrDefaultAsync(organization => organization.OrganizationId == id);
         if (organization == null)
         {
             _logger.LogInformation("Not found organization with id: {id}", id);
@@ -94,8 +91,8 @@ public class OrganizationController : ControllerBase
         }
         else
         {
-            ctx.Organizations.Update(_mapper.Map(organizationToPut, organization));
-            await ctx.SaveChangesAsync();
+            _mapper.Map(organizationToPut, organization);
+            await _context.SaveChangesAsync();
             return Ok(_mapper.Map<OrganizationGetDto>(organization));
         }
     }
@@ -108,8 +105,7 @@ public class OrganizationController : ControllerBase
     [HttpDelete("{id}")]
     public async Task<IActionResult> Delete(int id)
     {
-        using var ctx = await _contextFactory.CreateDbContextAsync();
-        var organization = await ctx.Organizations.FirstOrDefaultAsync(organization => organization.OrganizationId == id);
+        var organization = await _context.Organizations.FirstOrDefaultAsync(organization => organization.OrganizationId == id);
         if (organization == null)
         {
             _logger.LogInformation("Not found organization with id: {id}", id);
@@ -117,8 +113,8 @@ public class OrganizationController : ControllerBase
         }
         else
         {
-            ctx.Organizations.Remove(organization);
-            await ctx.SaveChangesAsync();
+            _context.Organizations.Remove(organization);
+            await _context.SaveChangesAsync();
             return Ok();
         }
     }

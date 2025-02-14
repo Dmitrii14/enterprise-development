@@ -13,16 +13,16 @@ namespace NonResidentialFund.Server.Controllers;
 [ApiController]
 public class BuildingController : ControllerBase
 {
-    private readonly IDbContextFactory<NonResidentialFundContext> _contextFactory;
+    private readonly NonResidentialFundContext _context;
     private readonly ILogger<BuildingController> _logger;
     private readonly IMapper _mapper;
 
     /// <summary>
     /// Initializes a new instance of the BuildingController class using dependency injection to set up logger, repository, and mapper instances.
     /// </summary>
-    public BuildingController(IDbContextFactory<NonResidentialFundContext> contextFactory, ILogger<BuildingController> logger, IMapper mapper)
+    public BuildingController(NonResidentialFundContext context, ILogger<BuildingController> logger, IMapper mapper)
     {
-        _contextFactory = contextFactory;
+        _context = context;
         _logger = logger;
         _mapper = mapper;
     }
@@ -35,8 +35,7 @@ public class BuildingController : ControllerBase
     public async Task<IEnumerable<BuildingGetDto>> Get()
     {
         _logger.LogInformation("Get all buildings");
-        using var ctx = await _contextFactory.CreateDbContextAsync();
-        var buildings = await ctx.Buildings.ToListAsync();
+        var buildings = await _context.Buildings.ToListAsync();
         return _mapper.Map<IEnumerable<BuildingGetDto>>(buildings);
     }
 
@@ -48,8 +47,7 @@ public class BuildingController : ControllerBase
     [HttpGet("{registrationNumber}")]
     public async Task<ActionResult<BuildingGetDto>> Get(int registrationNumber)
     {
-        using var ctx = await _contextFactory.CreateDbContextAsync();
-        var building = await ctx.Buildings.FirstOrDefaultAsync(building => building.RegistrationNumber == registrationNumber);
+        var building = await _context.Buildings.FirstOrDefaultAsync(building => building.RegistrationNumber == registrationNumber);
         if (building == null)
         {
             _logger.LogInformation("Not found building with registration number: {registrationNumber}", registrationNumber);
@@ -70,10 +68,9 @@ public class BuildingController : ControllerBase
     public async Task<ActionResult<BuildingGetDto>> Post([FromBody] BuildingPostDto building)
     {
         _logger.LogInformation("Created new building");
-        using var ctx = await _contextFactory.CreateDbContextAsync();
         var buildingToAdd = _mapper.Map<Building>(building);
-        ctx.Buildings.Add(buildingToAdd);
-        await ctx.SaveChangesAsync();
+        await _context.Buildings.AddAsync(buildingToAdd);
+        await _context.SaveChangesAsync();
         return Ok(_mapper.Map<BuildingGetDto>(buildingToAdd));
     }
 
@@ -86,8 +83,7 @@ public class BuildingController : ControllerBase
     [HttpPut("{registrationNumber}")]
     public async Task<ActionResult<BuildingGetDto>> Put(int registrationNumber, [FromBody] BuildingPostDto buildingToPut)
     {
-        using var ctx = await _contextFactory.CreateDbContextAsync();
-        var building = await ctx.Buildings.FirstOrDefaultAsync(building => building.RegistrationNumber == registrationNumber);
+        var building = await _context.Buildings.FirstOrDefaultAsync(building => building.RegistrationNumber == registrationNumber);
         if (building == null)
         {
             _logger.LogInformation("Not found building with registration number: {registrationNumber}", registrationNumber);
@@ -96,8 +92,8 @@ public class BuildingController : ControllerBase
         else
         {
             _logger.LogInformation("Updated building with registration number {registrationNumber}", registrationNumber);
-            ctx.Buildings.Update(_mapper.Map(buildingToPut, building));
-            await ctx.SaveChangesAsync();
+            _mapper.Map(buildingToPut, building);
+            await _context.SaveChangesAsync();
             return Ok(_mapper.Map<BuildingGetDto>(building));
         }
     }
@@ -110,8 +106,7 @@ public class BuildingController : ControllerBase
     [HttpDelete("{registrationNumber}")]
     public async Task<IActionResult> Delete(int registrationNumber)
     {
-        using var ctx = await _contextFactory.CreateDbContextAsync();
-        var building = await ctx.Buildings.FirstOrDefaultAsync(building => building.RegistrationNumber == registrationNumber);
+        var building = await _context.Buildings.FirstOrDefaultAsync(building => building.RegistrationNumber == registrationNumber);
         if (building == null)
         {
             _logger.LogInformation("Not found building with registration number: {registrationNumber}", registrationNumber);
@@ -120,8 +115,8 @@ public class BuildingController : ControllerBase
         else
         {
             _logger.LogInformation("Deleted building with registration number {registrationNumber}", registrationNumber);
-            ctx.Buildings.Remove(building);
-            await ctx.SaveChangesAsync();
+            _context.Buildings.Remove(building);
+            await _context.SaveChangesAsync();
             return Ok();
         }
     }
@@ -134,19 +129,18 @@ public class BuildingController : ControllerBase
     [HttpGet("{registrationNumber}/Auctions")]
     public async Task<ActionResult<IEnumerable<BuildingAuctionConnectionForBuildingDto>>> GetAuctions(int registrationNumber)
     {
-        using var ctx = await _contextFactory.CreateDbContextAsync();
-        var building = await ctx.Buildings.Include(building => building.Auctions).FirstOrDefaultAsync(building => building.RegistrationNumber == registrationNumber);
+        var building = await _context.Buildings
+        .Include(building => building.Auctions)
+        .FirstOrDefaultAsync(building => building.RegistrationNumber == registrationNumber);
         if (building == null)
         {
-            _logger.LogInformation("Not found building with registrationNumber: {registrationNumber}", registrationNumber);
+            _logger.LogInformation("Not found building with registration number: {registrationNumber}", registrationNumber);
             return NotFound();
         }
         else
         {
             _logger.LogInformation("Get auctions in which the building with registration number {registrationNumber} was put up for sale", registrationNumber);
-            return Ok(_mapper.Map<IEnumerable<BuildingAuctionConnectionForBuildingDto>>(
-                building.Auctions)
-                );
+            return Ok(_mapper.Map<IEnumerable<BuildingAuctionConnectionForBuildingDto>>(building.Auctions));
         }
     }
 
@@ -159,30 +153,28 @@ public class BuildingController : ControllerBase
     [HttpPost("{registrationNumber}/Auctions")]
     public async Task<ActionResult<BuildingAuctionConnectionForBuildingDto>> PostAuction(int registrationNumber, [FromBody] BuildingAuctionConnectionForBuildingDto connection)
     {
-        using var ctx = await _contextFactory.CreateDbContextAsync();
-        var building = await ctx.Buildings.Include(building => building.Auctions).FirstOrDefaultAsync(building => building.RegistrationNumber == registrationNumber);
-        var auction = await ctx.Auctions.FirstOrDefaultAsync(auction => auction.AuctionId == connection.AuctionId);
+        var building = await _context.Buildings
+        .Include(building => building.Auctions)
+        .FirstOrDefaultAsync(building => building.RegistrationNumber == registrationNumber);   
         if (building == null)
         {
             _logger.LogInformation("Not found building with registration number: {registrationNumber}", registrationNumber);
             return NotFound();
         }
+        var auction = await _context.Auctions.FirstOrDefaultAsync(a => a.AuctionId == connection.AuctionId);
+        if (auction != null && building.Auctions.FirstOrDefault(conn => conn.AuctionId == connection.AuctionId) == null)
+        {
+            _logger.LogInformation("Added auction with id {connection.AuctionId} to the list of auctions in which the building with " +
+                "registration number {registrationNumber} was put up for sale", connection.AuctionId, registrationNumber);
+            var connectionToAdd = new BuildingAuctionConnection(registrationNumber, connection.AuctionId);
+            building.Auctions.Add(connectionToAdd);        
+            await _context.SaveChangesAsync();       
+            return Ok(_mapper.Map<BuildingAuctionConnectionForBuildingDto>(connectionToAdd));
+        }
         else
         {
-            if (auction != null && building.Auctions.FirstOrDefault(conn => conn.AuctionId == connection.AuctionId) == null)
-            {
-                _logger.LogInformation("Added auction with id {connection.AuctionId} to the list of auctions in which the building with " +
-                    "registration number {registrationNumber} was put up for sale", connection.AuctionId, registrationNumber);
-                var connectionToAdd = new BuildingAuctionConnection(registrationNumber, connection.AuctionId);
-                building.Auctions.Add(connectionToAdd);
-                await ctx.SaveChangesAsync();
-                return Ok(_mapper.Map<BuildingAuctionConnectionForBuildingDto>(connectionToAdd));
-            }
-            else
-            {
-                return BadRequest();
-            }
-        }
+		    return BadRequest();
+	    }
     }
 
     /// <summary>
@@ -194,29 +186,26 @@ public class BuildingController : ControllerBase
     [HttpDelete("{registrationNumber}/Auctions")]
     public async Task<IActionResult> DeleteAuction(int registrationNumber, [FromBody] BuildingAuctionConnectionForBuildingDto connection)
     {
-        using var ctx = await _contextFactory.CreateDbContextAsync();
-        var building = await ctx.Buildings.Include(building => building.Auctions).FirstOrDefaultAsync(building => building.RegistrationNumber == registrationNumber);
-        var auction = await ctx.Auctions.FirstOrDefaultAsync(auction => auction.AuctionId == connection.AuctionId);
+        var building = await _context.Buildings
+        .Include(building => building.Auctions)
+        .FirstOrDefaultAsync(building => building.RegistrationNumber == registrationNumber);
         if (building == null)
         {
-            _logger.LogInformation("Not found buildiing with registration number: {registrationNumber}", registrationNumber);
+            _logger.LogInformation("Not found building with registration number: {registrationNumber}", registrationNumber);
             return NotFound();
         }
-        else
-        {
-            _logger.LogInformation("Removed auction with id {connection.AuctionId} to the list of auctions in which the building with " +
+        var auction = await _context.Auctions.FirstOrDefaultAsync(a => a.AuctionId == connection.AuctionId);
+        _logger.LogInformation("Removed auction with id {connection.AuctionId} from the list of auctions in which the building with " +
                     "registration number {registrationNumber} was put up for sale", connection.AuctionId, registrationNumber);
-            var connectionToDelete = building.Auctions.FirstOrDefault(conn => conn.AuctionId == connection.AuctionId);
-            if (connectionToDelete != null)
-            {
-                building.Auctions.Remove(connectionToDelete);
-                await ctx.SaveChangesAsync();
-                return Ok();
-            }
-            else
-            {
-                return BadRequest();
-            }
+        var connectionToDelete = building.Auctions.FirstOrDefault(conn => conn.AuctionId == connection.AuctionId);
+
+        if (connectionToDelete != null)
+        {
+            _context.Buildings.Local.First(b => b.RegistrationNumber == registrationNumber).Auctions.Remove(connectionToDelete);
+            await _context.SaveChangesAsync();
+            return Ok();
         }
+        else
+            return BadRequest();
     }
 }

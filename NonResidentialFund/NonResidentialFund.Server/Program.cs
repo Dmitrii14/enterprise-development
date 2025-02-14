@@ -27,7 +27,7 @@ var mapper = mapperConfig.CreateMapper();
 builder.Services.AddSingleton(mapper);
 builder.Services.AddSingleton<INonResidentialFundRepository, NonResidentialFundRepository>();
 
-builder.Services.AddDbContextFactory<NonResidentialFundContext>(options =>
+builder.Services.AddDbContext<NonResidentialFundContext>(options =>
 options.UseMySQL(builder.Configuration.GetConnectionString("NonResidentialFund")!));
 
 builder.Services.AddControllers();
@@ -48,7 +48,7 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
-app.UseCors("app");
+app.UseCors("AllowReactApp");
 
 app.UseHttpsRedirection();
 

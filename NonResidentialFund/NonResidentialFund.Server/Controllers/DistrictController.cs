@@ -13,16 +13,16 @@ namespace NonResidentialFund.Server.Controllers;
 [ApiController]
 public class DistrictController : ControllerBase
 {
-    private readonly IDbContextFactory<NonResidentialFundContext> _contextFactory;
+    private readonly NonResidentialFundContext _context;
     private readonly ILogger<DistrictController> _logger;
     private readonly IMapper _mapper;
 
     /// <summary>
     /// Initializes a new instance of the DistrictController class using dependency injection to set up logger, repository, and mapper instances.
     /// </summary>
-    public DistrictController(IDbContextFactory<NonResidentialFundContext> contextFactory, ILogger<DistrictController> logger, IMapper mapper)
+    public DistrictController(NonResidentialFundContext context, ILogger<DistrictController> logger, IMapper mapper)
     {
-        _contextFactory = contextFactory;
+        _context = context;
         _logger = logger;
         _mapper = mapper;
     }
@@ -35,8 +35,7 @@ public class DistrictController : ControllerBase
     public async Task<IEnumerable<DistrictGetDto>> Get()
     {
         _logger.LogInformation("Get all districts");
-        using var ctx = await _contextFactory.CreateDbContextAsync();
-        var districts = await ctx.Districts.ToListAsync();
+        var districts = await _context.Districts.ToListAsync();
         return _mapper.Map<IEnumerable<DistrictGetDto>>(districts);
     }
 
@@ -48,8 +47,7 @@ public class DistrictController : ControllerBase
     [HttpGet("{id}")]
     public async Task<ActionResult<DistrictGetDto>> Get(int id)
     {
-        using var ctx = await _contextFactory.CreateDbContextAsync();
-        var district = await ctx.Districts.FirstOrDefaultAsync(district => district.DistrictId == id);
+        var district = await _context.Districts.FirstOrDefaultAsync(district => district.DistrictId == id);
         if (district == null)
         {
             _logger.LogInformation("Not found district with id: {id}", id);
@@ -69,10 +67,10 @@ public class DistrictController : ControllerBase
     [HttpPost]
     public async Task<ActionResult<DistrictGetDto>> Post([FromBody] DistrictPostDto district)
     {
-        using var ctx = await _contextFactory.CreateDbContextAsync();
+        _logger.LogInformation("Created new district");
         var districtToAdd = _mapper.Map<District>(district);
-        ctx.Districts.Add(districtToAdd);
-        await ctx.SaveChangesAsync();
+        await _context.Districts.AddAsync(districtToAdd);
+        await _context.SaveChangesAsync();
         return Ok(_mapper.Map<DistrictGetDto>(districtToAdd));
     }
 
@@ -85,17 +83,16 @@ public class DistrictController : ControllerBase
     [HttpPut("{id}")]
     public async Task<ActionResult<DistrictGetDto>> Put(int id, [FromBody] DistrictPostDto districtToPut)
     {
-        using var ctx = await _contextFactory.CreateDbContextAsync();
-        var district = await ctx.Districts.FirstOrDefaultAsync(district => district.DistrictId == id);
+        var district = await _context.Districts.FirstOrDefaultAsync(district => district.DistrictId == id);
         if (district == null)
         {
-            _logger.LogInformation("Not found district {id}", id);
+            _logger.LogInformation("Not found district with id: {id}", id);
             return NotFound();
         }
         else
         {
-            ctx.Districts.Update(_mapper.Map(districtToPut, district));
-            await ctx.SaveChangesAsync();
+             _mapper.Map(districtToPut, district);
+            await _context.SaveChangesAsync();
             return Ok(_mapper.Map<DistrictGetDto>(district));
         }
     }
@@ -108,8 +105,7 @@ public class DistrictController : ControllerBase
     [HttpDelete("{id}")]
     public async Task<IActionResult> Delete(int id)
     {
-        using var ctx = await _contextFactory.CreateDbContextAsync();
-        var district = await ctx.Districts.FirstOrDefaultAsync(district => district.DistrictId == id);
+        var district = await _context.Districts.FirstOrDefaultAsync(district => district.DistrictId == id);
         if (district == null)
         {
             _logger.LogInformation("Not found district with id: {id}", id);
@@ -117,8 +113,8 @@ public class DistrictController : ControllerBase
         }
         else
         {
-            ctx.Districts.Remove(district);
-            await ctx.SaveChangesAsync();
+            _context.Districts.Remove(district);
+            await _context.SaveChangesAsync();
             return Ok();
         }
     }

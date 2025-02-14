@@ -8,20 +8,21 @@ namespace NonResidentialFund.Server.Controllers;
 
 /// <summary>
 /// Controller for handling requests related to non-residential fund operations.
+/// </summary>
 [Route("api/[controller]")]
 [ApiController]
 public class RequestsController : ControllerBase
 {
-    private readonly IDbContextFactory<NonResidentialFundContext> _contextFactory;
+    private readonly NonResidentialFundContext _context;
     private readonly ILogger<RequestsController> _logger;
     private readonly IMapper _mapper;
 
     /// <summary>
     /// Gets or sets the factory for creating instances of NonResidentialFundContext.
     /// </summary>
-    public RequestsController(IDbContextFactory<NonResidentialFundContext> contextFactory, ILogger<RequestsController> logger, IMapper mapper)
+    public RequestsController(NonResidentialFundContext context, ILogger<RequestsController> logger, IMapper mapper)
     {
-        _contextFactory = contextFactory;
+        _context = context;
         _logger = logger;
         _mapper = mapper;
     }
@@ -34,8 +35,8 @@ public class RequestsController : ControllerBase
     public async Task<IEnumerable<BuyerGetDto>> GetAllCustomers()
     {
         _logger.LogInformation("Get all buyers");
-        using var ctx = await _contextFactory.CreateDbContextAsync();
-        return _mapper.Map<IEnumerable<BuyerGetDto>>(ctx.Buyers);
+        var buyers = await _context.Buyers.ToListAsync();
+        return _mapper.Map<IEnumerable<BuyerGetDto>>(buyers);
     }
 
     /// <summary>
@@ -46,11 +47,9 @@ public class RequestsController : ControllerBase
     public async Task<IEnumerable<AuctionGetDto>> GetAuctionsNotAllLotsSold()
     {
         _logger.LogInformation("Get information on auctions in which all auctioned buildings were not sold");
-        using var ctx = await _contextFactory.CreateDbContextAsync();
-
-        var result = await (from auction in ctx.Auctions
+        var result = await (from auction in _context.Auctions
                             join countBoughtInAuction in (
-                                  from privatized in ctx.Privatized
+                                  from privatized in _context.Privatized
                                   group privatized by privatized.AuctionId into privGroup
                                   select new
                                   {
@@ -60,7 +59,6 @@ public class RequestsController : ControllerBase
                                   on auction.AuctionId equals countBoughtInAuction.AuctionId
                             where countBoughtInAuction.countBought != auction.Buildings.Count
                             select auction).ToListAsync();
-
         return _mapper.Map<IEnumerable<AuctionGetDto>>(result);
     }
 
@@ -72,13 +70,12 @@ public class RequestsController : ControllerBase
     [HttpGet("GetBuyersInSpecifiedDistrict/{id}")]
     public async Task<IEnumerable<BuyerGetDto>> GetBuyersInSpecifiedDistrict(int id)
     {
-        using var ctx = await _contextFactory.CreateDbContextAsync();
-        var result = await (from buyer in ctx.Buyers
-                            join privatized in ctx.Privatized on buyer.BuyerId equals privatized.BuyerId
-                            join building in ctx.Buildings on privatized.RegistrationNumber equals building.RegistrationNumber
+        var result = await (from buyer in _context.Buyers
+                            join privatized in _context.Privatized on buyer.BuyerId equals privatized.BuyerId
+                            join building in _context.Buildings on privatized.RegistrationNumber equals building.RegistrationNumber
                             join districtCountSold in (
-                                  from building in ctx.Buildings
-                                  join privatized in ctx.Privatized on building.RegistrationNumber equals privatized.RegistrationNumber
+                                  from building in _context.Buildings
+                                  join privatized in _context.Privatized on building.RegistrationNumber equals privatized.RegistrationNumber
                                   group new { privatized, building } by building.DistrictId into privGroupByDistrict
                                   select new
                                   {
@@ -86,8 +83,8 @@ public class RequestsController : ControllerBase
                                       CountSold = privGroupByDistrict.Count()
                                   }
                             ) on building.DistrictId equals districtCountSold.DistrictId
-                            where building.DistrictId == id
-                            orderby buyer.LastName, buyer.FirstName
+                            where building.DistrictId == id && districtCountSold.CountSold > 0
+                            orderby buyer.LastName, buyer.FirstName ascending
                             select buyer).ToListAsync();
         return _mapper.Map<IEnumerable<BuyerGetDto>>(result);
     }
@@ -99,13 +96,11 @@ public class RequestsController : ControllerBase
     [HttpGet("GetAddressesOfAuctionParticipantsInSpecifiedDate/{date:DateTime}")]
     public async Task<IEnumerable<BuyerAddressDto>> AddressesOfAuctionParticipantsInSpecifiedDate(DateTime date)
     {
-        using var ctx = await _contextFactory.CreateDbContextAsync();
-        var result = from auction in ctx.Auctions
-                     from participant in auction.Buyers
-                     join buyer in ctx.Buyers on participant.BuyerId equals buyer.BuyerId
-                     where auction.Date == date
-                     select buyer;
-
+        var result = await (from auction in _context.Auctions
+                            from participant in auction.Buyers
+                            join buyer in _context.Buyers on participant.BuyerId equals buyer.BuyerId
+                            where auction.Date == date
+                            select buyer).ToListAsync();
         return _mapper.Map<IEnumerable<BuyerAddressDto>>(result);
     }
 
@@ -116,15 +111,14 @@ public class RequestsController : ControllerBase
     [HttpGet("GetTopBuyersByExpenses")]
     public async Task<IEnumerable<BuyerExpensesDto>> GetTopBuyersByExpenses()
     {
-        using var ctx = await _contextFactory.CreateDbContextAsync();
-        var result = await (from privatized in ctx.Privatized
-                            join buyer in ctx.Buyers on privatized.BuyerId equals buyer.BuyerId
-                            group privatized by privatized.BuyerId into privGRoup
-                            orderby privGRoup.Sum(privatized => privatized.EndPrice) descending
+        var result = await (from privatized in _context.Privatized
+                            join buyer in _context.Buyers on privatized.BuyerId equals buyer.BuyerId
+                            group privatized by privatized.BuyerId into privGroup
+                            orderby privGroup.Sum(privatized => privatized.EndPrice) descending
                             select new BuyerExpensesDto()
                             {
-                                BuyerId = privGRoup.First().BuyerId,
-                                Expenses = privGRoup.Sum(privatized => privatized.EndPrice)
+                                BuyerId = privGroup.Key,
+                                Expenses = privGroup.Sum(privatized => privatized.EndPrice)
                             }).Take(5).ToListAsync();
         return result;
     }
@@ -136,15 +130,14 @@ public class RequestsController : ControllerBase
     [HttpGet("GetAuctionsWithHighestIncome")]
     public async Task<IEnumerable<AuctionIncomeDto>> GetAuctionsWithHighestIncome()
     {
-        using var ctx = await _contextFactory.CreateDbContextAsync();
-        var result = await (from privatized in ctx.Privatized
-                            join auction in ctx.Auctions on privatized.AuctionId equals auction.AuctionId
-                            group privatized by privatized.AuctionId into privGRoup
-                            orderby privGRoup.Sum(privatized => privatized.EndPrice - privatized.StartPrice) descending
+        var result = await (from privatized in _context.Privatized
+                            join auction in _context.Auctions on privatized.AuctionId equals auction.AuctionId
+                            group privatized by privatized.AuctionId into privGroup
+                            orderby privGroup.Sum(privatized => privatized.EndPrice - privatized.StartPrice) descending
                             select new AuctionIncomeDto
                             {
-                                AuctionId = privGRoup.First().AuctionId,
-                                Income = privGRoup.Sum(privatized => privatized.EndPrice - privatized.StartPrice)
+                                AuctionId = privGroup.Key, // Используем Key вместо First().AuctionId для корректного получения ID аукциона.
+                                Income = privGroup.Sum(privatized => privatized.EndPrice - privatized.StartPrice)
                             }).ToListAsync();
         return result;
     }
